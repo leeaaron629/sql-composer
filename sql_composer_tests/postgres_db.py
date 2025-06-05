@@ -2,6 +2,7 @@ import os
 import psycopg2
 from psycopg2 import Error
 from dotenv import load_dotenv
+from sql_composer.db_models import PostgresColumnMetadata
 
 load_dotenv()
 
@@ -161,6 +162,34 @@ def test_postgres_connection(host="localhost", database="postgres", user="postgr
         cursor.execute(create_random_row_sql)
         connection.commit()  # Commit the table creation and insert
         print("Table 'all_data_types' created successfully and sample row inserted!")
+
+        # Query table metadata
+        metadata_query = """
+            SELECT * FROM information_schema.columns t
+            WHERE t.table_name = 'all_data_types'
+            ;
+        """
+
+        cursor.execute(metadata_query)
+
+        column_names = [description[0] for description in cursor.description]
+        print(f"Column Names: {column_names}")
+        
+        metadata_results = cursor.fetchall()
+        
+        # Print metadata results in a clean tabular format
+        print("\nTable Metadata:")
+        metadata_dict = {}
+        for row in metadata_results:
+            # Create a dictionary mapping column names to their values
+            column_data = dict(zip(column_names, row))
+            table_col_name = str(column_data['column_name'])
+            column_metadata = PostgresColumnMetadata.from_dict(column_data)         
+            metadata_dict[table_col_name] = column_metadata
+        
+        # Pretty print the metadata objects
+        for col_name, metadata in metadata_dict.items():
+            print(f"Column: {col_name}, Type: {metadata.data_type}, Nullable: {metadata.is_nullable}, Default: {metadata.column_default}")
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", str(error))
