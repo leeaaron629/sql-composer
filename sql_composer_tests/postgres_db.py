@@ -2,7 +2,7 @@ import os
 import psycopg2
 from psycopg2 import Error
 from dotenv import load_dotenv
-from sql_composer.db_models import PostgresColumnMetadata
+from sql_composer.db_models import PostgresColumnMetadata, Table
 
 load_dotenv()
 
@@ -187,9 +187,11 @@ def test_postgres_connection(host="localhost", database="postgres", user="postgr
             column_metadata = PostgresColumnMetadata.from_dict(column_data)         
             metadata_dict[table_col_name] = column_metadata
         
-        # Pretty print the metadata objects
-        for col_name, metadata in metadata_dict.items():
-            print(f"Column: {col_name}, Type: {metadata.data_type}, Nullable: {metadata.is_nullable}, Default: {metadata.column_default}")
+        all_data_types_table = Table(name="all_data_types", columns=list(metadata_dict.values()))
+        print(f"table name: {all_data_types_table.name}")
+        for column in all_data_types_table.columns:
+            print(f"column name: {column.column_name}, type: {column.data_type}, nullable: {column.is_nullable}, default: {column.column_default}")
+
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", str(error))
