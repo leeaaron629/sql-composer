@@ -58,8 +58,10 @@ class SqlComposerPg:
         return textwrap.dedent(stmt)
     
     def insert(self, key_values: dict[str, any]):
+        column_map = {c.name: c for c in self.table.columns}
+        
         col_names_fmted = ", ".join([f"'{k}'" for k in key_values.keys()])
-        col_values_fmted = ", ".join([f"'{v}'" for v in key_values.values()])
+        col_values_fmted = ", ".join([f"'{v}'" for v in key_values.values()]) # TODO: Map value to the right SQL stmt based on column data type
 
         stmt = f"""
         INSERT INTO {self.table.name}
