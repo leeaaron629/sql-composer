@@ -6,20 +6,23 @@ from sql_composer.db_models import PostgresColumnMetadata, Table
 
 load_dotenv()
 
-def test_postgres_connection(host="localhost", database="postgres", user="postgres", password="postgres", port="5432"):
+
+def test_postgres_connection(
+    host="localhost",
+    database="postgres",
+    user="postgres",
+    password="postgres",
+    port="5432",
+):
     try:
         # Connect to PostgreSQL database
         connection = psycopg2.connect(
-            host=host,
-            database=database,
-            user=user,
-            password=password,
-            port=port
+            host=host, database=database, user=user, password=password, port=port
         )
-        
+
         # Create a cursor to perform database operations
         cursor = connection.cursor()
-        
+
         create_data_table_sql = """
             CREATE TABLE IF NOT EXISTS all_data_types (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -174,33 +177,37 @@ def test_postgres_connection(host="localhost", database="postgres", user="postgr
 
         column_names = [description[0] for description in cursor.description]
         print(f"Column Names: {column_names}")
-        
+
         metadata_results = cursor.fetchall()
-        
+
         # Print metadata results in a clean tabular format
         print("\nTable Metadata:")
         metadata_dict = {}
         for row in metadata_results:
             # Create a dictionary mapping column names to their values
             column_data = dict(zip(column_names, row))
-            table_col_name = str(column_data['column_name'])
-            column_metadata = PostgresColumnMetadata.from_dict(column_data)         
+            table_col_name = str(column_data["column_name"])
+            column_metadata = PostgresColumnMetadata.from_dict(column_data)
             metadata_dict[table_col_name] = column_metadata
-        
-        all_data_types_table = Table(name="all_data_types", columns=list(metadata_dict.values()))
+
+        all_data_types_table = Table(
+            name="all_data_types", columns=list(metadata_dict.values())
+        )
         print(f"table name: {all_data_types_table.name}")
         for column in all_data_types_table.columns:
-            print(f"column name: {column.column_name}, type: {column.data_type}, nullable: {column.is_nullable}, default: {column.column_default}")
-
+            print(
+                f"column name: {column.column_name}, type: {column.data_type}, nullable: {column.is_nullable}, default: {column.column_default}"
+            )
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", str(error))
-        
+
     finally:
-        if 'connection' in locals():
+        if "connection" in locals():
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
+
 
 if __name__ == "__main__":
     # Example usage
@@ -209,5 +216,5 @@ if __name__ == "__main__":
     user = os.getenv("DB_USER")
     password = os.getenv("DB_PASSWORD")
     port = os.getenv("DB_PORT")
-    
+
     test_postgres_connection(host, database, user, password, port)

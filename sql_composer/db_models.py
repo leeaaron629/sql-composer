@@ -1,8 +1,6 @@
 from dataclasses import dataclass
-from dotenv import load_dotenv
-from dataclasses import dataclass
-from typing import Optional, List
-from abc import ABC, abstractmethod
+from typing import List
+from abc import ABC
 import textwrap
 
 
@@ -19,22 +17,24 @@ class Table(ABC):
     def __init__(self, name: str):
         self.name = name
         self.columns = [
-            value for name, value in vars(self.__class__).items()
+            value
+            for name, value in vars(self.__class__).items()
             if isinstance(value, Column)
         ]
 
-class SandboxTable(Table):
 
+class SandboxTable(Table):
     some_str_field = Column(name="some_str_field", data_type="text")
     some_int_field = Column(name="some_int_field", data_type="int4")
 
-class SqlComposerPg:
 
+class SqlComposerPg:
     def __init__(self, table: Table):
         self.table = table
 
-    def select(self, columns: List[Column] | None = None, alias: str | None = None) -> str:
-    
+    def select(
+        self, columns: List[Column] | None = None, alias: str | None = None
+    ) -> str:
         if columns is None:
             col_names = [c.name for c in self.table.columns]
         else:
@@ -43,25 +43,27 @@ class SqlComposerPg:
 
         if alias is None:
             table_name = self.table.name
-            col_names_fmted = ", ".join(col_names)            
+            col_names_fmted = ", ".join(col_names)
         else:
             table_name = f"{self.table.name} AS {alias}"
             col_names_fmted = ", ".join([f"{alias}.{c_name}" for c_name in col_names])
-        
+
         stmt = f"""
         SELECT 
             {col_names_fmted}
         FROM {self.table.name}
         ;
         """
-        
+
         return textwrap.dedent(stmt)
-    
+
     def insert(self, key_values: dict[str, any]):
         column_map = {c.name: c for c in self.table.columns}
-        
+
         col_names_fmted = ", ".join([f"'{k}'" for k in key_values.keys()])
-        col_values_fmted = ", ".join([f"'{v}'" for v in key_values.values()]) # TODO: Map value to the right SQL stmt based on column data type
+        col_values_fmted = ", ".join(
+            [f"'{v}'" for v in key_values.values()]
+        )  # TODO: Map value to the right SQL stmt based on column data type
 
         stmt = f"""
         INSERT INTO {self.table.name}
@@ -94,10 +96,6 @@ if __name__ == "__main__":
     print("--------------------------------INSERT--------------------------------")
     key_values: dict[str, any] = {
         "some_str_field": "some_str_value",
-        "some_int_field": 123
+        "some_int_field": 123,
     }
     print(f"insert stmt_1: {sql_composer.insert(key_values)}")
-
-
-
-    
