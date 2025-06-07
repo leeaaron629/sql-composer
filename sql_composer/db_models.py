@@ -1,65 +1,101 @@
 from dataclasses import dataclass
 from dotenv import load_dotenv
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
+from abc import ABC, abstractmethod
+import textwrap
+
 
 @dataclass
-class PostgresColumnMetadata:
-    """Represents metadata for a PostgreSQL column from information_schema.columns"""
-    table_catalog: str
-    table_schema: str
-    table_name: str
-    column_name: str
-    ordinal_position: int
-    column_default: Optional[str]
-    is_nullable: str
-    data_type: str
-    character_maximum_length: Optional[int]
-    character_octet_length: Optional[int]
-    numeric_precision: Optional[int]
-    numeric_precision_radix: Optional[int]
-    numeric_scale: Optional[int]
-    datetime_precision: Optional[int]
-    interval_type: Optional[str]
-    interval_precision: Optional[int]
-    character_set_catalog: Optional[str]
-    character_set_schema: Optional[str]
-    character_set_name: Optional[str]
-    collation_catalog: Optional[str]
-    collation_schema: Optional[str]
-    collation_name: Optional[str]
-    domain_catalog: Optional[str]
-    domain_schema: Optional[str]
-    domain_name: Optional[str]
-    udt_catalog: str
-    udt_schema: str
-    udt_name: str
-    scope_catalog: Optional[str]
-    scope_schema: Optional[str]
-    scope_name: Optional[str]
-    maximum_cardinality: Optional[int]
-    dtd_identifier: str
-    is_self_referencing: str
-    is_identity: str
-    identity_generation: Optional[str]
-    identity_start: Optional[str]
-    identity_increment: Optional[str]
-    identity_maximum: Optional[str]
-    identity_minimum: Optional[str]
-    identity_cycle: str
-    is_generated: str
-    generation_expression: Optional[str]
-    is_updatable: str
-
-    @classmethod
-    def from_dict(cls, data: dict) -> 'PostgresColumnMetadata':
-        """Create a PostgresColumnMetadata instance from a dictionary."""
-        # Filter out duplicate keys and convert types appropriately
-        filtered_data = {k: v for k, v in data.items() if k in cls.__annotations__}
-        return cls(**filtered_data)
-
-@dataclass
-class Table:
+class Column:
     name: str
-    columns: list[PostgresColumnMetadata]
+    data_type: str
 
+
+class Table(ABC):
+    name: str
+    columns: List[Column] = []
+
+    def __init__(self, name: str):
+        self.name = name
+        self.columns = [
+            value for name, value in vars(self.__class__).items()
+            if isinstance(value, Column)
+        ]
+
+class SandboxTable(Table):
+
+    some_str_field = Column(name="some_str_field", data_type="text")
+    some_int_field = Column(name="some_int_field", data_type="int4")
+
+class SqlComposerPg:
+
+    def __init__(self, table: Table):
+        self.table = table
+
+    def select(self, columns: List[Column] | None = None, alias: str | None = None) -> str:
+    
+        if columns is None:
+            col_names = [c.name for c in self.table.columns]
+        else:
+            col_names_set = set([c.name for c in columns])
+            col_names = [c.name for c in self.table.columns if c.name in col_names_set]
+
+        if alias is None:
+            table_name = self.table.name
+            col_names_fmted = ", ".join(col_names)            
+        else:
+            table_name = f"{self.table.name} AS {alias}"
+            col_names_fmted = ", ".join([f"{alias}.{c_name}" for c_name in col_names])
+        
+        stmt = f"""
+        SELECT 
+            {col_names_fmted}
+        FROM {self.table.name}
+        ;
+        """
+        
+        return textwrap.dedent(stmt)
+    
+    def insert(self, key_values: dict[str, any]):
+        col_names_fmted = ", ".join([f"'{k}'" for k in key_values.keys()])
+        col_values_fmted = ", ".join([f"'{v}'" for v in key_values.values()])
+
+        stmt = f"""
+        INSERT INTO {self.table.name}
+        ({col_names_fmted})
+        VALUES
+        ({col_values_fmted})
+        ;
+        """
+        return textwrap.dedent(stmt)
+
+    def update(self):
+        pass
+
+    def delete(self):
+        pass
+
+
+if __name__ == "__main__":
+    table = SandboxTable("some_test_table")
+    sql_composer = SqlComposerPg(table)
+
+    print(f"{sql_composer.table.name}")
+    for c in sql_composer.table.columns:
+        print(f"{c.name} - {c.data_type}")
+
+    print("--------------------------------SELECT--------------------------------")
+    print(f"select stmt_1: {sql_composer.select()}")
+    print(f"select stmt_2: {sql_composer.select(columns=[table.some_int_field])}")
+    print(f"select stmt_3: {sql_composer.select(alias='alias_1')}")
+    print("--------------------------------INSERT--------------------------------")
+    key_values: dict[str, any] = {
+        "some_str_field": "some_str_value",
+        "some_int_field": 123
+    }
+    print(f"insert stmt_1: {sql_composer.insert(key_values)}")
+
+
+
+    
