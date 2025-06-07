@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-from dotenv import load_dotenv
-from dataclasses import dataclass
 from typing import Optional
+
 
 @dataclass
 class PostgresColumnMetadata:
     """Represents metadata for a PostgreSQL column from information_schema.columns"""
+
     table_catalog: str
     table_schema: str
     table_name: str
@@ -52,14 +52,14 @@ class PostgresColumnMetadata:
     is_updatable: str
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'PostgresColumnMetadata':
+    def from_dict(cls, data: dict) -> "PostgresColumnMetadata":
         """Create a PostgresColumnMetadata instance from a dictionary."""
         # Filter out duplicate keys and convert types appropriately
         filtered_data = {k: v for k, v in data.items() if k in cls.__annotations__}
         return cls(**filtered_data)
 
+
 @dataclass
 class Table:
     name: str
     columns: list[PostgresColumnMetadata]
-
