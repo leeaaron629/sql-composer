@@ -71,6 +71,22 @@ class Table(ABC):
 class SandboxTable(Table):
     some_str_field = Column(name="some_str_field", type_=PgDataTypes.TEXT)
     some_int_field = Column(name="some_int_field", type_=PgDataTypes.INT4)
+    
+    # Additional columns for key_values_2 - one from each logic path
+    text_field = Column(name="text_field", type_=PgDataTypes.TEXT)
+    int_field = Column(name="int_field", type_=PgDataTypes.INT)
+    bigint_field = Column(name="bigint_field", type_=PgDataTypes.BIGINT)
+    smallint_field = Column(name="smallint_field", type_=PgDataTypes.SMALLINT)
+    numeric_field = Column(name="numeric_field", type_=PgDataTypes.NUMERIC)
+    real_field = Column(name="real_field", type_=PgDataTypes.REAL)
+    double_field = Column(name="double_field", type_=PgDataTypes.DOUBLE_PRECISION)
+    boolean_field = Column(name="boolean_field", type_=PgDataTypes.BOOLEAN)
+    date_field = Column(name="date_field", type_=PgDataTypes.DATE)
+    timestamp_field = Column(name="timestamp_field", type_=PgDataTypes.TIMESTAMP)
+    timestamptz_field = Column(name="timestamptz_field", type_=PgDataTypes.TIMESTAMPTZ)
+    time_field = Column(name="time_field", type_=PgDataTypes.TIME)
+    json_field = Column(name="json_field", type_=PgDataTypes.JSON)
+    uuid_field = Column(name="uuid_field", type_=PgDataTypes.UUID)
 
 
 class SqlComposerPg:
@@ -178,8 +194,25 @@ if __name__ == "__main__":
     print(f"select stmt_2: {sql_composer.select(columns=[table.some_int_field])}")
     print(f"select stmt_3: {sql_composer.select(alias='alias_1')}")
     print("--------------------------------INSERT--------------------------------")
-    key_values: dict[str, any] = {
+    key_values_1: dict[str, any] = {
         "some_str_field": "some_str_value",
         "some_int_field": 123,
     }
-    print(f"insert stmt_1: {sql_composer.insert(key_values)}")
+    print(f"insert stmt_1: {sql_composer.insert(key_values_1)}")
+    key_values_2: dict[str, any] = {
+        "text_field": "sample text value",
+        "int_field": 42,
+        "bigint_field": 9223372036854775807,
+        "smallint_field": 32767,
+        "numeric_field": 123.45,
+        "real_field": 3.14,
+        "double_field": 2.718281828459045,
+        "boolean_field": True,
+        "date_field": "2024-01-15",
+        "timestamp_field": "2024-01-15 10:30:00",
+        "timestamptz_field": "2024-01-15 10:30:00+00",
+        "time_field": "10:30:00",
+        "json_field": '{"key": "value", "number": 42}',
+        "uuid_field": "550e8400-e29b-41d4-a716-446655440000",
+    }
+    print(f"insert stmt_2: {sql_composer.insert(key_values_2)}")
