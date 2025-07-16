@@ -112,7 +112,7 @@ class SqlComposerPg:
         stmt = f"""
         SELECT 
             {col_names_fmted}
-        FROM {self.table.name}
+        FROM {table_name}
         ;
         """
 
@@ -121,29 +121,46 @@ class SqlComposerPg:
     def insert(self, key_values: dict[str, any]):
         column_map = {c.name: c for c in self.table.columns}
 
-        col_names_fmted = ", ".join([f"'{k}'" for k in key_values.keys()])
-        col_values_fmted = ", ".join(
-            [
-                SqlComposerPg.to_expr(column_map[col_name], value)
-                for col_name, value in key_values.items()
-                if column_map.get(col_name, None) is not None
-            ]
-        )  # TODO: Map value to the right SQL stmt based on column data type
+        col_names = [f"'{k}'" for k in key_values.keys()]
+        col_values = [
+            SqlComposerPg.to_expr(column_map[col_name], value)
+            for col_name, value in key_values.items()
+            if column_map.get(col_name, None) is not None
+        ]
 
         stmt = f"""
         INSERT INTO {self.table.name}
-        ({col_names_fmted})
+        ({",".join(col_names)})
         VALUES
-        ({col_values_fmted}) 
+        ({",".join(col_values)}) 
         ;
         """
         return textwrap.dedent(stmt)
 
-    def update(self):
-        pass
+    def update(self, key_values: dict[str, any]):
+        if not key_values:
+            return ""
+
+        column_map = {c.name: c for c in self.table.columns}
+        new_values = [
+            f"{k} = {SqlComposerPg.to_expr(column_map[k], value)}"
+            for k, value in key_values.items()
+            if column_map.get(k, None) is not None
+        ]
+        stmt = f"""
+            UPDATE {self.table.name}
+            SET {", ".join(new_values)}
+            ;
+        """
+        return textwrap.dedent(stmt)
+        
 
     def delete(self):
-        pass
+        stmt = f"""
+            DELETE FROM {self.table.name}
+            ;
+        """
+        return textwrap.dedent(stmt)
 
     @staticmethod
     def to_expr(column: Column, value: any) -> str:
@@ -232,3 +249,27 @@ if __name__ == "__main__":
         "uuid_field": "00000000-0000-0000-0000-000000000000",  # Nil UUID
     }
     print(f"insert stmt_3: {sql_composer.insert(key_values_3)}")
+    print("--------------------------------UPDATE--------------------------------")
+    update_values_1: dict[str, any] = {
+        "some_str_field": "updated_str_value",
+        "some_int_field": 456,
+    }
+    print(f"update stmt_1: {sql_composer.update(update_values_1)}")
+    update_values_2: dict[str, any] = {
+        "text_field": "updated text value",
+        "int_field": 100,
+        "boolean_field": False,
+        "numeric_field": 999.99,
+    }
+    print(f"update stmt_2: {sql_composer.update(update_values_2)}")
+    update_values_3: dict[str, any] = {
+        # Edge cases for update
+        "text_field": "Updated with 'quotes' and \"double quotes\"",
+        "int_field": 0,
+        "boolean_field": True,
+        "date_field": "2024-12-31",
+        "json_field": '{"updated": true, "timestamp": "2024-01-15T10:30:00Z"}',
+    }
+    print(f"update stmt_3: {sql_composer.update(update_values_3)}")
+    # Test empty update
+    print(f"update stmt_empty: {sql_composer.update({})}")
