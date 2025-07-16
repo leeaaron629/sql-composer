@@ -87,7 +87,7 @@ class SandboxTable(Table):
     time_field = Column(name="time_field", type_=PgDataTypes.TIME)
     json_field = Column(name="json_field", type_=PgDataTypes.JSON)
     uuid_field = Column(name="uuid_field", type_=PgDataTypes.UUID)
-
+    
 
 class SqlComposerPg:
     def __init__(self, table: Table):
@@ -216,3 +216,19 @@ if __name__ == "__main__":
         "uuid_field": "550e8400-e29b-41d4-a716-446655440000",
     }
     print(f"insert stmt_2: {sql_composer.insert(key_values_2)}")
+    key_values_3: dict[str, any] = {
+        # String edge cases
+        "text_field": "O'Connor's data with 'quotes' and \"double quotes\"", # TODO: Escape all single and double quotes
+        # Numeric edge cases
+        "int_field": 0,  # Zero value
+        "numeric_field": float('inf'),  # Infinity
+        # Boolean edge cases
+        "boolean_field": False,  # False boolean
+        # Date edge cases
+        "date_field": "2024-02-29",  # Leap year date
+        # JSON edge cases
+        "json_field": '{"nested": {"array": [1, 2, 3], "null_value": null, "boolean": true, "string": "with \'quotes\'"}}',
+        # UUID edge cases
+        "uuid_field": "00000000-0000-0000-0000-000000000000",  # Nil UUID
+    }
+    print(f"insert stmt_3: {sql_composer.insert(key_values_3)}")
