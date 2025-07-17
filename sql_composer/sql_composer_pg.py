@@ -1,11 +1,11 @@
 from typing import List
 from sql_composer.db_models import Table, Column
 import textwrap
-from sql_composer.sql_translator import SqlTranslor
+from sql_composer.sql_translator import SqlTranslator
 
 
 class SqlComposerPg:
-    def __init__(self, translator: SqlTranslor, table: Table):
+    def __init__(self, translator: SqlTranslator, table: Table):
         self.translator = translator
         self.table = table
 

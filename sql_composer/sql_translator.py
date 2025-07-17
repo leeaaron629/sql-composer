@@ -3,7 +3,7 @@ from sql_composer.db_models import Column, Sort, Page
 from sql_composer.db_conditions import Where
 
 
-class SqlTranslor(ABC):
+class SqlTranslator(ABC):
     @abstractmethod
     def val_to_sql(column: Column, value: any) -> str:
         pass
