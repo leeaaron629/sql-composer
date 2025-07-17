@@ -1,9 +1,11 @@
+from typing import Any
 from sql_composer.db_models import Column, PgDataTypes
-from sql_composer.db_conditions import Where, PgFilterOp, Sort, Page
+from sql_composer.db_conditions import Where, Sort, Page
+from sql_composer.pg.pg_filter_op import PgFilterOp
 
 
 class PgSqlTranslor:
-    def val_to_sql(self, column: Column, value: any) -> str:
+    def val_to_sql(self, column: Column, value: Any) -> str:
         match column.type_:
             case (
                 PgDataTypes.TEXT
@@ -253,7 +255,7 @@ class PgSqlTranslor:
                 )
 
     def sort_to_sql(self, sort: Sort) -> str:
-        pass
+        return f"{sort.field} {sort.sort_type.value}"
 
     def pagination_to_sql(self, pagination: Page) -> str:
-        pass
+        return f"LIMIT {pagination.limit} OFFSET {pagination.offset}"

@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
-from sql_composer.db_models import Column, Sort, Page
-from sql_composer.db_conditions import Where
+from typing import Any
+from sql_composer.db_models import Column
+from sql_composer.db_conditions import Where, Sort, Page
 
 
 class SqlTranslator(ABC):
     @abstractmethod
-    def val_to_sql(column: Column, value: any) -> str:
+    def val_to_sql(self, column: Column, value: Any) -> str:
         pass
 
     @abstractmethod

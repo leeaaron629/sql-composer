@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 from enum import Enum
 from dataclasses import dataclass
 
@@ -31,7 +31,7 @@ class FilterOp:
 class Where:
     field: str
     op: FilterOp
-    values: List[any]
+    values: List[Any]
 
 
 # WHERE Clause

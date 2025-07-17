@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 from sql_composer.db_models import Table, Column
 import textwrap
 from sql_composer.sql_translator import SqlTranslator
@@ -34,7 +34,7 @@ class SqlComposerPg:
 
         return textwrap.dedent(stmt)
 
-    def insert(self, key_values: dict[str, any]):
+    def insert(self, key_values: dict[str, Any]):
         column_map = {c.name: c for c in self.table.columns}
 
         col_names = [f"'{k}'" for k in key_values.keys()]
@@ -53,7 +53,7 @@ class SqlComposerPg:
         """
         return textwrap.dedent(stmt)
 
-    def update(self, key_values: dict[str, any]):
+    def update(self, key_values: dict[str, Any]):
         if not key_values:
             return ""
 
