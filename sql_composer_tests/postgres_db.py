@@ -178,6 +178,10 @@ def test_postgres_connection(
 
         cursor.execute(metadata_query)
 
+        if cursor.description is None:
+            print("No results returned from metadata query")
+            return
+
         column_names = [description[0] for description in cursor.description]
         print(f"Column Names: {column_names}")
 
@@ -193,14 +197,10 @@ def test_postgres_connection(
             column_metadata = PostgresColumnMetadata.from_dict(column_data)
             metadata_dict[table_col_name] = column_metadata
 
-        all_data_types_table = Table(
-            name="all_data_types"
-        )
+        all_data_types_table = Table(name="all_data_types")
         print(f"table name: {all_data_types_table.name}")
         for column in all_data_types_table.columns:
-            print(
-                f"column name: {column.name}, type: {column.type_}"
-            )
+            print(f"column name: {column.name}, type: {column.type_}")
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", str(error))

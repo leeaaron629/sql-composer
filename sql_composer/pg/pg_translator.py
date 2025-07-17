@@ -2,9 +2,10 @@ from typing import Any
 from sql_composer.db_models import Column, PgDataTypes
 from sql_composer.db_conditions import Where, Sort, Page
 from sql_composer.pg.pg_filter_op import PgFilterOp
+from sql_composer.sql_translator import SqlTranslator
 
 
-class PgSqlTranslor:
+class PgSqlTranslor(SqlTranslator):
     def val_to_sql(self, column: Column, value: Any) -> str:
         match column.type_:
             case (

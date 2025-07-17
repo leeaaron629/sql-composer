@@ -1,6 +1,6 @@
 from typing import Any
 from sql_composer.db_models import Table, Column, PgDataTypes
-from sql_composer.sql_composer_pg import SqlComposerPg
+from sql_composer.sql_composer import SqlComposer
 from sql_composer.pg.pg_translator import PgSqlTranslor
 
 
@@ -28,7 +28,7 @@ class SandboxTable(Table):
 if __name__ == "__main__":
     table = SandboxTable("some_test_table")
     translator = PgSqlTranslor()
-    sql_composer = SqlComposerPg(translator, table)
+    sql_composer = SqlComposer(translator, table)
 
     print(f"{sql_composer.table.name}")
     for c in sql_composer.table.columns:
