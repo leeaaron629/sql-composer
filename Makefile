@@ -1,7 +1,5 @@
 .PHONY: help install build test lint format clean
 
-# Default Python interpreter
-PYTHON := python3
 # UV executable
 UV := uv
 # Project name
@@ -17,29 +15,29 @@ help:
 	@echo "  make clean        - Remove Python cache files and build artifacts"
 
 install:
+	@echo "Creating virtual environment if it doesn't exist..."
+	$(UV) venv
 	@echo "Installing dependencies..."
-	$(UV) pip install -e .
+	$(UV) pip install -e ".[dev]"
 
 build:
 	@echo "Building package..."
-	$(UV) pip install build
-	$(PYTHON) -m build
+	$(UV) run python -m build
 
 test:
 	@echo "Running tests..."
-	$(UV) pip install pytest pytest-cov
-	$(PYTHON) -m pytest tests/ --cov=$(PROJECT) --cov-report=term-missing
+	$(UV) run python -m pytest tests/ --cov=$(PROJECT) --cov-report=term-missing
 
 lint:
 	@echo "Running linters..."
-	$(PYTHON) -m ruff check .
-	$(PYTHON) -m ruff format --check .
-	$(PYTHON) -m pyright
+	$(UV) run python -m ruff check .
+	$(UV) run python -m ruff format --check .
+	$(UV) run python -m pyright
 
 format:
 	@echo "Formatting code..."
-	$(PYTHON) -m ruff format .
-	$(PYTHON) -m ruff check --fix .
+	$(UV) run python -m ruff format .
+	$(UV) run python -m ruff check --fix .
 
 clean:
 	@echo "Cleaning up..."
