@@ -3,8 +3,16 @@ from sql_composer.db_models import Table, Column
 import textwrap
 from sql_composer.sql_translator import SqlTranslator
 
+"""
+SqlComposer is a class that composes SQL statements.
+It is used to compose SQL statements for a given table and a given translator.
+The translator is responsible for translating the SQL statements to the appropriate SQL dialect.
 
-class SqlComposerPg:
+Future Extension:
+For cases where the SqlComposer core logic is not re-useable, 
+please extend the SqlComposer class and override the methods you need.
+"""
+class SqlComposer:
     def __init__(self, translator: SqlTranslator, table: Table):
         self.translator = translator
         self.table = table
