@@ -1,9 +1,11 @@
 from typing import List
-from sql_composer.db_models import Table, Column, PgDataTypes
+from sql_composer.db_models import Table, Column
 import textwrap
+from sql_composer.sql_translator import SqlTranslor
 
 class SqlComposerPg:
-    def __init__(self, table: Table):
+    def __init__(self, translator: SqlTranslor, table: Table):
+        self.translator = translator
         self.table = table
 
     def select(
@@ -36,7 +38,7 @@ class SqlComposerPg:
 
         col_names = [f"'{k}'" for k in key_values.keys()]
         col_values = [
-            SqlComposerPg.to_expr(column_map[col_name], value)
+            self.translator.val_to_sql(column_map[col_name], value)
             for col_name, value in key_values.items()
             if column_map.get(col_name, None) is not None
         ]
@@ -56,7 +58,7 @@ class SqlComposerPg:
 
         column_map = {c.name: c for c in self.table.columns}
         new_values = [
-            f"{k} = {SqlComposerPg.to_expr(column_map[k], value)}"
+            f"{k} = {self.translator.val_to_sql(column_map[k], value)}"
             for k, value in key_values.items()
             if column_map.get(k, None) is not None
         ]
@@ -75,39 +77,5 @@ class SqlComposerPg:
         """
         return textwrap.dedent(stmt)
 
-    @staticmethod
-    def to_expr(column: Column, value: any) -> str:
-        match column.type_:
-            case PgDataTypes.TEXT | PgDataTypes.VARCHAR | PgDataTypes.CHAR | PgDataTypes.CHARACTER_VARYING:
-                return f"'{value}'"
-            case PgDataTypes.INT | PgDataTypes.INT4 | PgDataTypes.INTEGER:
-                return str(value)
-            case PgDataTypes.BIGINT | PgDataTypes.INT8:
-                return str(value)
-            case PgDataTypes.SMALLINT | PgDataTypes.INT2:
-                return str(value)
-            case PgDataTypes.NUMERIC | PgDataTypes.DECIMAL:
-                return str(value)
-            case PgDataTypes.REAL | PgDataTypes.FLOAT4:
-                return str(value)
-            case PgDataTypes.DOUBLE_PRECISION | PgDataTypes.FLOAT8:
-                return str(value)
-            case PgDataTypes.BOOLEAN | PgDataTypes.BOOL:
-                return str(value).lower()
-            case PgDataTypes.DATE:
-                return f"'{value}'"
-            case PgDataTypes.TIMESTAMP | PgDataTypes.TIMESTAMP_WITHOUT_TIME_ZONE:
-                return f"'{value}'"
-            case PgDataTypes.TIMESTAMPTZ | PgDataTypes.TIMESTAMP_WITH_TIME_ZONE:
-                return f"'{value}'"
-            case PgDataTypes.TIME:
-                return f"'{value}'"
-            case PgDataTypes.JSON | PgDataTypes.JSONB:
-                return f"'{value}'"
-            case PgDataTypes.UUID:
-                return f"'{value}'"
-            case _:
-                # Default case: treat as string
-                return f"'{value}'"
 
 
