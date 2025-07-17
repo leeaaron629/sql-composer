@@ -1,5 +1,6 @@
 from typing import Any
-from sql_composer.db_models import Table, Column, PgDataTypes
+from sql_composer.db_models import Table, Column
+from sql_composer.pg.pg_data_types import PgDataTypes
 from sql_composer.sql_composer import SqlComposer
 from sql_composer.pg.pg_translator import PgSqlTranslor
 

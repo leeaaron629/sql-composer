@@ -12,6 +12,8 @@ Future Extension:
 For cases where the SqlComposer core logic is not re-useable, 
 please extend the SqlComposer class and override the methods you need.
 """
+
+
 class SqlComposer:
     def __init__(self, translator: SqlTranslator, table: Table):
         self.translator = translator

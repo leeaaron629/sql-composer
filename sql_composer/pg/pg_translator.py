@@ -1,6 +1,7 @@
 from typing import Any
-from sql_composer.db_models import Column, PgDataTypes
+from sql_composer.db_models import Column
 from sql_composer.db_conditions import Where, Sort, Page
+from sql_composer.pg.pg_data_types import PgDataTypes
 from sql_composer.pg.pg_filter_op import PgFilterOp
 from sql_composer.sql_translator import SqlTranslator
 
