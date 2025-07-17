@@ -1,9 +1,11 @@
 from sql_composer.db_models import Table, Column, PgDataTypes
 from sql_composer.sql_composer_pg import SqlComposerPg
+
+
 class SandboxTable(Table):
     some_str_field = Column(name="some_str_field", type_=PgDataTypes.TEXT)
     some_int_field = Column(name="some_int_field", type_=PgDataTypes.INT4)
-    
+
     # Additional columns for key_values_2 - one from each logic path
     text_field = Column(name="text_field", type_=PgDataTypes.TEXT)
     int_field = Column(name="int_field", type_=PgDataTypes.INT)
@@ -19,6 +21,7 @@ class SandboxTable(Table):
     time_field = Column(name="time_field", type_=PgDataTypes.TIME)
     json_field = Column(name="json_field", type_=PgDataTypes.JSON)
     uuid_field = Column(name="uuid_field", type_=PgDataTypes.UUID)
+
 
 if __name__ == "__main__":
     table = SandboxTable("some_test_table")
@@ -57,10 +60,10 @@ if __name__ == "__main__":
     print(f"insert stmt_2: {sql_composer.insert(key_values_2)}")
     key_values_3: dict[str, any] = {
         # String edge cases
-        "text_field": "O'Connor's data with 'quotes' and \"double quotes\"", # TODO: Escape all single and double quotes
+        "text_field": "O'Connor's data with 'quotes' and \"double quotes\"",  # TODO: Escape all single and double quotes
         # Numeric edge cases
         "int_field": 0,  # Zero value
-        "numeric_field": float('inf'),  # Infinity
+        "numeric_field": float("inf"),  # Infinity
         # Boolean edge cases
         "boolean_field": False,  # False boolean
         # Date edge cases
@@ -95,4 +98,3 @@ if __name__ == "__main__":
     print(f"update stmt_3: {sql_composer.update(update_values_3)}")
     # Test empty update
     print(f"update stmt_empty: {sql_composer.update({})}")
-

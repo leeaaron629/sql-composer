@@ -3,6 +3,7 @@ from sql_composer.db_models import Table, Column
 import textwrap
 from sql_composer.sql_translator import SqlTranslor
 
+
 class SqlComposerPg:
     def __init__(self, translator: SqlTranslor, table: Table):
         self.translator = translator
@@ -68,7 +69,6 @@ class SqlComposerPg:
             ;
         """
         return textwrap.dedent(stmt)
-        
 
     def delete(self):
         stmt = f"""
@@ -76,6 +76,3 @@ class SqlComposerPg:
             ;
         """
         return textwrap.dedent(stmt)
-
-
-

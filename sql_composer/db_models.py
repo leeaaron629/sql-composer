@@ -10,7 +10,7 @@ class PgDataTypes(Enum):
     VARCHAR = "varchar"
     CHAR = "char"
     CHARACTER_VARYING = "character varying"
-    
+
     # Integer types
     INT = "int"
     INT4 = "int4"
@@ -19,7 +19,7 @@ class PgDataTypes(Enum):
     INT8 = "int8"
     SMALLINT = "smallint"
     INT2 = "int2"
-    
+
     # Numeric types
     NUMERIC = "numeric"
     DECIMAL = "decimal"
@@ -27,11 +27,11 @@ class PgDataTypes(Enum):
     FLOAT4 = "float4"
     DOUBLE_PRECISION = "double precision"
     FLOAT8 = "float8"
-    
+
     # Boolean types
     BOOLEAN = "boolean"
     BOOL = "bool"
-    
+
     # Date/Time types
     DATE = "date"
     TIMESTAMP = "timestamp"
@@ -39,11 +39,11 @@ class PgDataTypes(Enum):
     TIMESTAMPTZ = "timestamptz"
     TIMESTAMP_WITH_TIME_ZONE = "timestamp with time zone"
     TIME = "time"
-    
+
     # JSON types
     JSON = "json"
     JSONB = "jsonb"
-    
+
     # UUID type
     UUID = "uuid"
 
@@ -65,4 +65,3 @@ class Table(ABC):
             for name, value in vars(self.__class__).items()
             if isinstance(value, Column)
         ]
-

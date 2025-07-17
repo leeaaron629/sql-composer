@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from sql_composer.db_models import Column, Sort, Page
 from sql_composer.db_conditions import Where
 
-class SqlTranslor(ABC):
 
+class SqlTranslor(ABC):
     @abstractmethod
     def val_to_sql(column: Column, value: any) -> str:
         pass
@@ -19,4 +19,3 @@ class SqlTranslor(ABC):
     @abstractmethod
     def pagination_to_sql(self, pagination: Page) -> str:
         pass
-        
