@@ -44,7 +44,7 @@ class SqlComposer:
         SELECT 
             {col_names_fmted}
         FROM {table_name}
-        {self.translator.query_criteria_to_sql(query_criteria)}
+        {self.translator.query_criteria_to_sql(query_criteria, columns_by_name)}
         """
 
         return textwrap.dedent(stmt)
@@ -52,7 +52,7 @@ class SqlComposer:
     def insert(self, key_values: dict[str, Any]):
         column_map = {c.name: c for c in self.table.columns}
 
-        col_names = [f"'{k}'" for k in key_values.keys()]
+        col_names = [k for k in key_values.keys() if column_map.get(k, None) is not None]
         col_values = [
             self.translator.val_to_sql(column_map[col_name], value)
             for col_name, value in key_values.items()

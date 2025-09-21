@@ -1,14 +1,14 @@
 import unittest
-from sql_composer.pg.pg_translator import PgSqlTranslor
+from sql_composer.pg.pg_translator import PgSqlTranslator
 from sql_composer.db_models import Column
 from sql_composer.db_conditions import Where, WhereClause, Sort, Page, SqlQueryCriteria, SortType
 from sql_composer.pg.pg_data_types import PgDataTypes
 from sql_composer.pg.pg_filter_op import PgFilterOp
 
 
-class TestPgSqlTranslor(unittest.TestCase):
+class TestPgSqlTranslator(unittest.TestCase):
     def setUp(self):
-        self.translator = PgSqlTranslor()
+        self.translator = PgSqlTranslator()
 
     def test_val_to_sql_string_types(self):
         """Test val_to_sql for string data types"""
@@ -160,7 +160,10 @@ class TestPgSqlTranslor(unittest.TestCase):
 
     def test_query_criteria_to_sql_sort_only(self):
         """Test query_criteria_to_sql with only SORT clause"""
-        columns_by_name = {}
+        columns_by_name = {
+            "name": Column("name", PgDataTypes.TEXT),
+            "created_at": Column("created_at", PgDataTypes.TIMESTAMP)
+        }
         
         sort_clause = [
             Sort("name", SortType.ASC),

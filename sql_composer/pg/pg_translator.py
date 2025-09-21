@@ -6,8 +6,18 @@ from sql_composer.pg.pg_filter_op import PgFilterOp
 from sql_composer.sql_translator import SqlTranslator
 
 
-class PgSqlTranslor(SqlTranslator):
-    """PostgresSQL Translator"""
+class PgSqlTranslator(SqlTranslator):
+    """PostgreSQL Translator"""
+
+    @staticmethod
+    def _escape_string(value: str) -> str:
+        """Enhanced string escaping for PostgreSQL - WARNING: Not sufficient for production use"""
+        # Escape single quotes (PostgreSQL standard)
+        value = value.replace("'", "''")
+        # Escape backslashes (PostgreSQL specific)
+        value = value.replace("\\", "\\\\")
+        return value
+å
     def val_to_sql(self, column: Column, value: Any) -> str:
         match column.type_:
             case (
@@ -16,7 +26,7 @@ class PgSqlTranslor(SqlTranslator):
                 | PgDataTypes.CHAR
                 | PgDataTypes.CHARACTER_VARYING
             ):
-                return f"'{value}'"
+                return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.INT | PgDataTypes.INT4 | PgDataTypes.INTEGER:
                 return str(value)
             case PgDataTypes.BIGINT | PgDataTypes.INT8:
@@ -32,20 +42,20 @@ class PgSqlTranslor(SqlTranslator):
             case PgDataTypes.BOOLEAN | PgDataTypes.BOOL:
                 return str(value).lower()
             case PgDataTypes.DATE:
-                return f"'{value}'"
+                return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.TIMESTAMP | PgDataTypes.TIMESTAMP_WITHOUT_TIME_ZONE:
-                return f"'{value}'"
+                return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.TIMESTAMPTZ | PgDataTypes.TIMESTAMP_WITH_TIME_ZONE:
-                return f"'{value}'"
+                return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.TIME:
-                return f"'{value}'"
+                return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.JSON | PgDataTypes.JSONB:
-                return f"'{value}'"
+                return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.UUID:
-                return f"'{value}'"
+                return f"'{self._escape_string(str(value))}'"
             case _:
                 # Default case: treat as string
-                return f"'{value}'"
+                return f"'{self._escape_string(str(value))}'"
 
     def where_to_sql(self, where: Where, column: Column) -> str:
         # Convert all values to SQL expressions
@@ -270,6 +280,8 @@ class PgSqlTranslor(SqlTranslator):
 
     def query_criteria_to_sql(self, query_criteria: SqlQueryCriteria, columns_by_name: dict[str, Column]) -> str:
 
+        assert query_criteria is not None, "query_criteria is required"
+
         query_criteria_as_sql = ""
 
         # Query Criteria - Where
@@ -289,6 +301,7 @@ class PgSqlTranslor(SqlTranslator):
             sort_criteria_as_sql = [
                 f"{self.sort_to_sql(sort)}"
                 for sort in query_criteria.sort
+                if sort.field in columns_by_name
             ]
 
             if sort_criteria_as_sql:

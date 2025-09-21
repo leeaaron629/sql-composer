@@ -2,7 +2,7 @@ from typing import Any
 from sql_composer.db_models import Table, Column
 from sql_composer.pg.pg_data_types import PgDataTypes
 from sql_composer.sql_composer import SqlComposer
-from sql_composer.pg.pg_translator import PgSqlTranslor
+from sql_composer.pg.pg_translator import PgSqlTranslator
 
 
 class SandboxTable(Table):
@@ -28,7 +28,7 @@ class SandboxTable(Table):
 
 if __name__ == "__main__":
     table = SandboxTable("some_test_table")
-    translator = PgSqlTranslor()
+    translator = PgSqlTranslator()
     sql_composer = SqlComposer(translator, table)
 
     print(f"{sql_composer.table.name}")
