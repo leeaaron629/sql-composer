@@ -23,7 +23,7 @@ class Page:
 
 
 # Filter Operators
-class FilterOp:
+class FilterOp(Enum):
     pass
 
 
@@ -38,3 +38,11 @@ class Where:
 @dataclass
 class WhereClause:
     conditions: List[Where]
+
+
+# SQL Query Criteria - Wrapper for all query conditions
+@dataclass
+class SqlQueryCriteria:
+    where: WhereClause | None = None
+    sort: List[Sort] | None = None
+    page: Page | None = None
