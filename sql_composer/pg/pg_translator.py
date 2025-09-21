@@ -260,7 +260,7 @@ class PgSqlTranslor(SqlTranslator):
     def sort_to_sql(self, sort: Sort) -> str:
         return f"{sort.field} {sort.sort_type.value}"
 
-    def pagination_to_sql(self, pagination: Page) -> str:
+    def page_criteria_to_sql(self, pagination: Page) -> str:
         page_criteria_as_sql = []
         if pagination.limit:
             page_criteria_as_sql.append(f"LIMIT {pagination.limit}")
@@ -273,28 +273,30 @@ class PgSqlTranslor(SqlTranslator):
         query_criteria_as_sql = ""
 
         # Query Criteria - Where
-        conditions_as_sql = [
-            f"{self.where_to_sql(condition, columns_by_name[condition.field])}"
-            for condition in query_criteria.where.conditions
-            if condition.field in columns_by_name
-        ]
+        if query_criteria.where:
+            conditions_as_sql = [
+                f"{self.where_to_sql(condition, columns_by_name[condition.field])}"
+                for condition in query_criteria.where.conditions
+                if condition.field in columns_by_name
+            ]
 
-        if conditions_as_sql:
-            conditions_as_sql = "\nAND ".join(conditions_as_sql)
-            query_criteria_as_sql += f"\nWHERE {conditions_as_sql}"
+            if conditions_as_sql:
+                conditions_as_sql = "\nAND ".join(conditions_as_sql)
+                query_criteria_as_sql += f"\nWHERE {conditions_as_sql}"
 
         # Query Criteria - Sort
-        sort_criteria_as_sql = [
-            f"{self.sort_to_sql(sort)}"
-            for sort in query_criteria.sort
-        ]
+        if query_criteria.sort:
+            sort_criteria_as_sql = [
+                f"{self.sort_to_sql(sort)}"
+                for sort in query_criteria.sort
+            ]
 
-        if sort_criteria_as_sql:
-            sort_criteria_as_sql = " ".join(sort_criteria_as_sql)
-            query_criteria_as_sql += f"\nORDER BY {sort_criteria_as_sql}"
+            if sort_criteria_as_sql:
+                sort_criteria_as_sql = " ".join(sort_criteria_as_sql)
+                query_criteria_as_sql += f"\nORDER BY {sort_criteria_as_sql}"
 
         # Query Criteria - Pagination
         if query_criteria.page:
-            query_criteria_as_sql += f"\n{self.pagination_to_sql(query_criteria.page)}"
+            query_criteria_as_sql += f"\n{self.page_criteria_to_sql(query_criteria.page)}"
 
         return query_criteria_as_sql
