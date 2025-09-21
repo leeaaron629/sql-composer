@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 from sql_composer.db_models import Column
-from sql_composer.db_conditions import Where, Sort, Page
+from sql_composer.db_conditions import Where, Sort, Page, SqlQueryCriteria
 
 
 class SqlTranslator(ABC):
@@ -18,5 +18,9 @@ class SqlTranslator(ABC):
         pass
 
     @abstractmethod
-    def pagination_to_sql(self, pagination: Page) -> str:
+    def page_criteria_to_sql(self, pagination: Page) -> str:
+        pass
+
+    @abstractmethod
+    def query_criteria_to_sql(self, query_criteria: SqlQueryCriteria, columns_by_name: dict[str, Column]) -> str:
         pass

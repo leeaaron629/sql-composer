@@ -1,8 +1,7 @@
-from enum import Enum
 from sql_composer.db_conditions import FilterOp
 
 
-class PgFilterOp(Enum, FilterOp):
+class PgFilterOp(FilterOp):
     # Comparison operators
     EQUAL = "="
     NOT_EQUAL = "!="

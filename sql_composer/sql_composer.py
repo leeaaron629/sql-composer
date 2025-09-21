@@ -2,6 +2,7 @@ from typing import List, Any
 from sql_composer.db_models import Table, Column
 import textwrap
 from sql_composer.sql_translator import SqlTranslator
+from sql_composer.db_conditions import WhereClause, SqlQueryCriteria
 
 """
 SqlComposer is a class that composes SQL statements.
@@ -20,14 +21,18 @@ class SqlComposer:
         self.table = table
 
     def select(
-        self, columns: List[Column] | None = None, alias: str | None = None
+        self,
+        columns: List[Column] | None = None,
+        alias: str | None = None,
+        query_criteria: SqlQueryCriteria | None = None,
     ) -> str:
-        if columns is None:
-            col_names = [c.name for c in self.table.columns]
-        else:
-            col_names_set = set([c.name for c in columns])
-            col_names = [c.name for c in self.table.columns if c.name in col_names_set]
 
+        if columns is None:
+            columns_by_name = {c.name: c for c in self.table.columns}
+        else:
+            columns_by_name = {c.name: c for c in columns}
+
+        col_names = columns_by_name.keys()
         if alias is None:
             table_name = self.table.name
             col_names_fmted = ", ".join(col_names)
@@ -39,7 +44,7 @@ class SqlComposer:
         SELECT 
             {col_names_fmted}
         FROM {table_name}
-        ;
+        {self.translator.query_criteria_to_sql(query_criteria)}
         """
 
         return textwrap.dedent(stmt)
