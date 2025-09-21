@@ -18,8 +18,8 @@ class Sort:
 # Pagination Clause
 @dataclass
 class Page:
-    limit: int
-    offset: int
+    limit: int | None = None
+    offset: int | None = None
 
 
 # Filter Operators
