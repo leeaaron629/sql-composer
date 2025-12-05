@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, List, Tuple
 from sql_composer.db_models import Column
 from sql_composer.db_conditions import Where, Sort, Page, SqlQueryCriteria
 
@@ -23,4 +23,8 @@ class SqlTranslator(ABC):
 
     @abstractmethod
     def query_criteria_to_sql(self, query_criteria: SqlQueryCriteria, columns_by_name: dict[str, Column]) -> str:
+        pass
+
+    @abstractmethod
+    def query_criteria_to_sql_with_params(self, query_criteria: SqlQueryCriteria, columns_by_name: dict[str, Column]) -> Tuple[str, List[Any]]:
         pass
