@@ -26,7 +26,7 @@ build:
 
 test:
 	@echo "Running tests..."
-	$(UV) run python -m pytest tests/ --cov=$(PROJECT) --cov-report=term-missing
+	$(UV) run python -m pytest sql_composer_tests/ --cov=$(PROJECT) --cov-report=term-missing	
 
 lint:
 	@echo "Running linters..."
