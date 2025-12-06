@@ -22,7 +22,7 @@ class SqlComposer:
 
     def select(
         self,
-        columns: List[Column] | None = None,
+        columns: List[Column],
         alias: str | None = None,
         query_criteria: SqlQueryCriteria | None = None,
     ) -> str:
@@ -48,7 +48,7 @@ class SqlComposer:
 
     def select_with_params(
         self,
-        columns: List[Column] | None = None,
+        columns: List[Column],
         alias: str | None = None,
         query_criteria: SqlQueryCriteria | None = None,
     ) -> Tuple[str, List[Any]]:
@@ -90,7 +90,7 @@ class SqlComposer:
         INSERT INTO {self.table.name}
         ({",".join(col_names)})
         VALUES
-        ({",".join(col_values)}) 
+        ({",".join(valid_col_values)})
         ;
         """
         return textwrap.dedent(stmt)
