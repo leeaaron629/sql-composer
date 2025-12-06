@@ -1,8 +1,7 @@
-from sql_composer.db_models import DataTypes
 from enum import Enum
 
 
-class PgDataTypes(DataTypes, Enum):
+class PgDataTypes(Enum):
     # String types
     TEXT = "text"
     VARCHAR = "varchar"

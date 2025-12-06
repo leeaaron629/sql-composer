@@ -3,11 +3,6 @@ from typing import List
 from abc import ABC
 from enum import Enum
 
-
-class DataTypes(Enum):
-    pass
-
-
 @dataclass
 class Column:
     name: str
