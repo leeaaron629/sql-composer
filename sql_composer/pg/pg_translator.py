@@ -76,6 +76,9 @@ class PgSqlTranslator(SqlTranslator):
         # Convert all values to SQL expressions
         values_as_pg_sql = [self.val_to_sql(column, value) for value in where.values]
 
+        if len(where.values) == 0:
+            raise ValueError(f"Operator {where.op} requires at least 1 value, got 0")
+
         if len(values_as_pg_sql) != 1 and where.op in (
             PgFilterOp.EQUAL,
             PgFilterOp.NOT_EQUAL,
@@ -376,6 +379,9 @@ class PgSqlTranslator(SqlTranslator):
         Generate parameterized WHERE clause with extracted parameters.
         Returns a tuple of (SQL with %s placeholders, parameters list).
         """
+        if len(where.values) == 0:
+            raise ValueError(f"Operator {where.op} requires at least 1 value, got 0")
+
         # Validate number of values for the operator
         if len(where.values) != 1 and where.op in (
             PgFilterOp.EQUAL,
