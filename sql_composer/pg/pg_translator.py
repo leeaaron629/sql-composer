@@ -1,3 +1,4 @@
+import json
 import math
 from typing import Any, List, Tuple
 from sql_composer.db_models import Column, Table
@@ -65,7 +66,7 @@ class PgSqlTranslator(SqlTranslator):
             case PgDataTypes.TIME:
                 return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.JSON | PgDataTypes.JSONB:
-                return f"'{self._escape_string(str(value))}'"
+                return f"'{self._escape_string(json.dumps(value))}'"
             case PgDataTypes.UUID:
                 return f"'{self._escape_string(str(value))}'"
             case _:
