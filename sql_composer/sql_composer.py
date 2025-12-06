@@ -26,13 +26,10 @@ class SqlComposer:
         alias: str | None = None,
         query_criteria: SqlQueryCriteria | None = None,
     ) -> str:
+        if not columns:
+            raise ValueError("No columns provided")
 
-        if columns is None:
-            columns_by_name = {c.name: c for c in self.table.columns}
-        else:
-            columns_by_name = {c.name: c for c in columns}
-
-        col_names = columns_by_name.keys()
+        col_names = [c.name for c in columns]
         if alias is None:
             table_name = self.table.name
             col_names_fmted = ", ".join(col_names)
@@ -55,16 +52,9 @@ class SqlComposer:
         alias: str | None = None,
         query_criteria: SqlQueryCriteria | None = None,
     ) -> Tuple[str, List[Any]]:
-        """
-        Generate a parameterized SELECT query.
-        Returns a tuple of (SQL, parameters) for safe execution.
-        """
-        if columns is None:
-            columns_by_name = {c.name: c for c in self.table.columns}
-        else:
-            columns_by_name = {c.name: c for c in columns}
-
-        col_names = columns_by_name.keys()
+        if not columns:
+            raise ValueError("No columns provided")
+        col_names = [c.name for c in columns]
         if alias is None:
             table_name = self.table.name
             col_names_fmted = ", ".join(col_names)
@@ -88,11 +78,13 @@ class SqlComposer:
         column_map = {c.name: c for c in self.table.columns}
 
         col_names = [k for k in key_values.keys() if column_map.get(k, None) is not None]
-        col_values = [
+        valid_col_values = [
             self.translator.val_to_sql(column_map[col_name], value)
             for col_name, value in key_values.items()
             if column_map.get(col_name, None) is not None
         ]
+        if not valid_col_values:
+            raise ValueError("No valid columns to insert")
 
         stmt = f"""
         INSERT INTO {self.table.name}
@@ -112,9 +104,8 @@ class SqlComposer:
 
         # Filter to only include valid columns
         valid_key_values = {k: v for k, v in key_values.items() if column_map.get(k, None) is not None}
-
         if not valid_key_values:
-            return "", []
+            raise ValueError("No valid columns to insert")
 
         col_names = list(valid_key_values.keys())
         col_values = list(valid_key_values.values())
@@ -132,19 +123,23 @@ class SqlComposer:
 
         return textwrap.dedent(stmt), col_values
 
-    def update(self, key_values: dict[str, Any]):
+    def update(self, key_values: dict[str, Any]) -> str:
         if not key_values:
             return ""
 
         column_map = {c.name: c for c in self.table.columns}
-        new_values = [
+        new_valid_key_values = [
             f"{k} = {self.translator.val_to_sql(column_map[k], value)}"
             for k, value in key_values.items()
             if column_map.get(k, None) is not None
         ]
+
+        if not new_valid_key_values:
+            raise ValueError("No valid columns to update")
+
         stmt = f"""
             UPDATE {self.table.name}
-            SET {", ".join(new_values)}
+            SET {", ".join(new_valid_key_values)}
             ;
         """
         return textwrap.dedent(stmt)
@@ -163,7 +158,7 @@ class SqlComposer:
         valid_key_values = {k: v for k, v in key_values.items() if column_map.get(k, None) is not None}
 
         if not valid_key_values:
-            return "", []
+            raise ValueError("No valid columns to update")
 
         # Create SET clause with parameter placeholders
         set_clauses = [f"{k} = %s" for k in valid_key_values.keys()]
