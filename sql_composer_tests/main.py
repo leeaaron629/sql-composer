@@ -10,7 +10,7 @@ PROJECT_NAME = os.getenv("PROJECT_NAME")
 
 def main():
     print(f"Hello from {PROJECT_NAME}!")
-    table = Table(name="test", columns=[])
+    table = Table(name="test")
     print(table)
 
 

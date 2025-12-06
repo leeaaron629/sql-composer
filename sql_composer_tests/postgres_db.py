@@ -2,7 +2,8 @@ import os
 import psycopg2
 from psycopg2 import Error
 from dotenv import load_dotenv
-from sql_composer.db_models import PostgresColumnMetadata, Table
+from sql_composer.db_metadata import PostgresColumnMetadata
+from sql_composer.db_models import Table
 
 load_dotenv()
 
@@ -14,6 +15,8 @@ def test_postgres_connection(
     password="postgres",
     port="5432",
 ):
+    connection = None
+    cursor = None
     try:
         # Connect to PostgreSQL database
         connection = psycopg2.connect(
@@ -175,6 +178,10 @@ def test_postgres_connection(
 
         cursor.execute(metadata_query)
 
+        if cursor.description is None:
+            print("No results returned from metadata query")
+            return
+
         column_names = [description[0] for description in cursor.description]
         print(f"Column Names: {column_names}")
 
@@ -190,21 +197,18 @@ def test_postgres_connection(
             column_metadata = PostgresColumnMetadata.from_dict(column_data)
             metadata_dict[table_col_name] = column_metadata
 
-        all_data_types_table = Table(
-            name="all_data_types", columns=list(metadata_dict.values())
-        )
+        all_data_types_table = Table(name="all_data_types")
         print(f"table name: {all_data_types_table.name}")
         for column in all_data_types_table.columns:
-            print(
-                f"column name: {column.column_name}, type: {column.data_type}, nullable: {column.is_nullable}, default: {column.column_default}"
-            )
+            print(f"column name: {column.name}, type: {column.type_}")
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", str(error))
 
     finally:
-        if "connection" in locals():
+        if cursor is not None:
             cursor.close()
+        if connection is not None:
             connection.close()
             print("PostgreSQL connection is closed")
 
@@ -217,4 +221,8 @@ if __name__ == "__main__":
     password = os.getenv("DB_PASSWORD")
     port = os.getenv("DB_PORT")
 
-    test_postgres_connection(host, database, user, password, port)
+    # Add null checks for environment variables
+    if host and database and user and password and port:
+        test_postgres_connection(host, database, user, password, port)
+    else:
+        print("Missing required environment variables for database connection")
