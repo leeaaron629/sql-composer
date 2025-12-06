@@ -28,6 +28,31 @@ class TestPgSqlTranslator(unittest.TestCase):
         self.assertEqual(self.translator.val_to_sql(bigint_col, 9223372036854775807), "9223372036854775807")
         self.assertEqual(self.translator.val_to_sql(numeric_col, 123.45), "123.45")
 
+    def test_val_to_sql_special_float_values(self):
+        """Test val_to_sql for special float values (infinity, -infinity, NaN)"""
+        numeric_col = Column("value", PgDataTypes.NUMERIC)
+        decimal_col = Column("amount", PgDataTypes.DECIMAL)
+        real_col = Column("rate", PgDataTypes.REAL)
+        double_col = Column("precision", PgDataTypes.DOUBLE_PRECISION)
+
+        # Test positive infinity
+        self.assertEqual(self.translator.val_to_sql(numeric_col, float("inf")), "'Infinity'")
+        self.assertEqual(self.translator.val_to_sql(decimal_col, float("inf")), "'Infinity'")
+        self.assertEqual(self.translator.val_to_sql(real_col, float("inf")), "'Infinity'")
+        self.assertEqual(self.translator.val_to_sql(double_col, float("inf")), "'Infinity'")
+
+        # Test negative infinity
+        self.assertEqual(self.translator.val_to_sql(numeric_col, float("-inf")), "'-Infinity'")
+        self.assertEqual(self.translator.val_to_sql(decimal_col, float("-inf")), "'-Infinity'")
+        self.assertEqual(self.translator.val_to_sql(real_col, float("-inf")), "'-Infinity'")
+        self.assertEqual(self.translator.val_to_sql(double_col, float("-inf")), "'-Infinity'")
+
+        # Test NaN
+        self.assertEqual(self.translator.val_to_sql(numeric_col, float("nan")), "'NaN'")
+        self.assertEqual(self.translator.val_to_sql(decimal_col, float("nan")), "'NaN'")
+        self.assertEqual(self.translator.val_to_sql(real_col, float("nan")), "'NaN'")
+        self.assertEqual(self.translator.val_to_sql(double_col, float("nan")), "'NaN'")
+
     def test_val_to_sql_boolean_types(self):
         """Test val_to_sql for boolean data types"""
         bool_col = Column("active", PgDataTypes.BOOLEAN)

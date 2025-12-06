@@ -1,3 +1,4 @@
+import math
 from typing import Any, List, Tuple
 from sql_composer.db_models import Column
 from sql_composer.db_conditions import Where, Sort, Page, SqlQueryCriteria
@@ -18,6 +19,20 @@ class PgSqlTranslator(SqlTranslator):
         value = value.replace("\\", "\\\\")
         return value
 
+    @staticmethod
+    def _float_to_sql(value: float) -> str:
+        """Convert a float value to PostgreSQL SQL representation.
+
+        Handles special float values (infinity, -infinity, NaN) by returning
+        the PostgreSQL-expected quoted string literals.
+        """
+        if isinstance(value, float):
+            if math.isinf(value):
+                return "'Infinity'" if value > 0 else "'-Infinity'"
+            if math.isnan(value):
+                return "'NaN'"
+        return str(value)
+
     def val_to_sql(self, column: Column, value: Any) -> str:
         match column.type_:
             case (
@@ -34,11 +49,11 @@ class PgSqlTranslator(SqlTranslator):
             case PgDataTypes.SMALLINT | PgDataTypes.INT2:
                 return str(value)
             case PgDataTypes.NUMERIC | PgDataTypes.DECIMAL:
-                return str(value)
+                return self._float_to_sql(value) if isinstance(value, float) else str(value)
             case PgDataTypes.REAL | PgDataTypes.FLOAT4:
-                return str(value)
+                return self._float_to_sql(value) if isinstance(value, float) else str(value)
             case PgDataTypes.DOUBLE_PRECISION | PgDataTypes.FLOAT8:
-                return str(value)
+                return self._float_to_sql(value) if isinstance(value, float) else str(value)
             case PgDataTypes.BOOLEAN | PgDataTypes.BOOL:
                 return str(value).lower()
             case PgDataTypes.DATE:
