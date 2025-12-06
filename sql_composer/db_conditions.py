@@ -23,9 +23,10 @@ class Page:
 
 
 # Filter Operators
-class FilterOp(Enum):
-    pass
-
+@dataclass
+class FilterOp:
+    name: str
+    sql: str
 
 @dataclass
 class Where:

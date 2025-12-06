@@ -1,83 +1,84 @@
 from sql_composer.db_conditions import FilterOp
+from enum import Enum
 
-
-class PgFilterOp(FilterOp):
+# TODO If sql is not needed, remove it and keep the name only
+class PgFilterOp(Enum):
     # Comparison operators
-    EQUAL = "="
-    NOT_EQUAL = "!="
-    NOT_EQUAL_ALT = "<>"
-    LESS_THAN = "<"
-    LESS_THAN_OR_EQUAL = "<="
-    GREATER_THAN = ">"
-    GREATER_THAN_OR_EQUAL = ">="
+    EQUAL = FilterOp(name="EQUAL", sql="=")
+    NOT_EQUAL = FilterOp(name="NOT_EQUAL", sql="!=")
+    NOT_EQUAL_ALT = FilterOp(name="NOT_EQUAL_ALT", sql="<>")
+    LESS_THAN = FilterOp(name="LESS_THAN", sql="<")
+    LESS_THAN_OR_EQUAL = FilterOp(name="LESS_THAN_OR_EQUAL", sql="<=")
+    GREATER_THAN = FilterOp(name="GREATER_THAN", sql=">")
+    GREATER_THAN_OR_EQUAL = FilterOp(name="GREATER_THAN_OR_EQUAL", sql=">=")
 
     # Pattern matching operators
-    LIKE = "LIKE"
-    NOT_LIKE = "NOT LIKE"
-    ILIKE = "ILIKE"
-    NOT_ILIKE = "NOT ILIKE"
-    SIMILAR_TO = "SIMILAR TO"
-    NOT_SIMILAR_TO = "NOT SIMILAR TO"
-    REGEXP = "~"
-    NOT_REGEXP = "!~"
-    REGEXP_CASE_INSENSITIVE = "~*"
-    NOT_REGEXP_CASE_INSENSITIVE = "!~*"
+    LIKE = FilterOp(name="LIKE", sql="LIKE")
+    NOT_LIKE = FilterOp(name="NOT_LIKE", sql="NOT LIKE")
+    ILIKE = FilterOp(name="ILIKE", sql="ILIKE")
+    NOT_ILIKE = FilterOp(name="NOT_ILIKE", sql="NOT ILIKE")
+    SIMILAR_TO = FilterOp(name="SIMILAR_TO", sql="SIMILAR TO")
+    NOT_SIMILAR_TO = FilterOp(name="NOT_SIMILAR_TO", sql="NOT SIMILAR TO")
+    REGEXP = FilterOp(name="REGEXP", sql="~")
+    NOT_REGEXP = FilterOp(name="NOT_REGEXP", sql="!~")
+    REGEXP_CASE_INSENSITIVE = FilterOp(name="REGEXP_CASE_INSENSITIVE", sql="~*")
+    NOT_REGEXP_CASE_INSENSITIVE = FilterOp(name="NOT_REGEXP_CASE_INSENSITIVE", sql="!~*")
 
     # Set membership operators
-    IN = "IN"
-    NOT_IN = "NOT IN"
+    IN = FilterOp(name="IN", sql="IN")
+    NOT_IN = FilterOp(name="NOT_IN", sql="NOT IN")
 
     # Null operators
-    IS_NULL = "IS NULL"
-    IS_NOT_NULL = "IS NOT NULL"
+    IS_NULL = FilterOp(name="IS_NULL", sql="IS NULL")
+    IS_NOT_NULL = FilterOp(name="IS_NOT_NULL", sql="IS NOT NULL")
 
     # Range operators
-    BETWEEN = "BETWEEN"
-    NOT_BETWEEN = "NOT BETWEEN"
+    BETWEEN = FilterOp(name="BETWEEN", sql="BETWEEN")
+    NOT_BETWEEN = FilterOp(name="NOT_BETWEEN", sql="NOT BETWEEN")
 
     # Array operators
-    CONTAINS = "@>"
-    IS_CONTAINED_BY = "<@"
-    OVERLAPS = "&&"
+    CONTAINS = FilterOp(name="CONTAINS", sql="@>")
+    IS_CONTAINED_BY = FilterOp(name="IS_CONTAINED_BY", sql="<@")
+    OVERLAPS = FilterOp(name="OVERLAPS", sql="&&")
 
     # JSON operators
-    JSON_CONTAINS = "@>"
-    JSON_IS_CONTAINED_BY = "<@"
-    JSON_HAS_KEY = "?"
-    JSON_HAS_ANY_KEY = "?|"
-    JSON_HAS_ALL_KEYS = "?&"
+    JSON_CONTAINS = FilterOp(name="JSON_CONTAINS", sql="@>")
+    JSON_IS_CONTAINED_BY = FilterOp(name="JSON_IS_CONTAINED_BY", sql="<@")
+    JSON_HAS_KEY = FilterOp(name="JSON_HAS_KEY", sql="?")
+    JSON_HAS_ANY_KEY = FilterOp(name="JSON_HAS_ANY_KEY", sql="?|")
+    JSON_HAS_ALL_KEYS = FilterOp(name="JSON_HAS_ALL_KEYS", sql="?&")
 
     # String operators
-    CONTAINS_STRING = "~~"
-    NOT_CONTAINS_STRING = "!~~"
-    CONTAINS_STRING_CASE_INSENSITIVE = "~~*"
-    NOT_CONTAINS_STRING_CASE_INSENSITIVE = "!~~*"
+    CONTAINS_STRING = FilterOp(name="CONTAINS_STRING", sql="~~")
+    NOT_CONTAINS_STRING = FilterOp(name="NOT_CONTAINS_STRING", sql="!~~")
+    CONTAINS_STRING_CASE_INSENSITIVE = FilterOp(name="CONTAINS_STRING_CASE_INSENSITIVE", sql="~~*")
+    NOT_CONTAINS_STRING_CASE_INSENSITIVE = FilterOp(name="NOT_CONTAINS_STRING_CASE_INSENSITIVE", sql="!~~*")
 
     # Geometric operators
-    OVERLAPS_GEOMETRY = "&&"
-    CONTAINS_GEOMETRY = "@>"
-    IS_CONTAINED_BY_GEOMETRY = "<@"
-    INTERSECTS = "&&"
+    OVERLAPS_GEOMETRY = FilterOp(name="OVERLAPS_GEOMETRY", sql="&&")
+    CONTAINS_GEOMETRY = FilterOp(name="CONTAINS_GEOMETRY", sql="@>")
+    IS_CONTAINED_BY_GEOMETRY = FilterOp(name="IS_CONTAINED_BY_GEOMETRY", sql="<@")
+    INTERSECTS = FilterOp(name="INTERSECTS", sql="&&")
 
     # Network operators
-    CONTAINS_INET = ">>"
-    IS_CONTAINED_BY_INET = "<<"
-    IS_SUBNET = ">>="
-    IS_SUPERNET = "<<="
+    CONTAINS_INET = FilterOp(name="CONTAINS_INET", sql=">>")
+    IS_CONTAINED_BY_INET = FilterOp(name="IS_CONTAINED_BY_INET", sql="<<")
+    IS_SUBNET = FilterOp(name="IS_SUBNET", sql=">>=")
+    IS_SUPERNET = FilterOp(name="IS_SUPERNET", sql="<<=")
 
     # Full text search operators
-    FULLTEXT_MATCH = "@@"
-    FULLTEXT_QUERY = "@@@"
+    FULLTEXT_MATCH = FilterOp(name="FULLTEXT_MATCH", sql="@@")
+    FULLTEXT_QUERY = FilterOp(name="FULLTEXT_QUERY", sql="@@@")
 
     # Special comparison operators
-    IS_DISTINCT_FROM = "IS DISTINCT FROM"
-    IS_NOT_DISTINCT_FROM = "IS NOT DISTINCT FROM"
+    IS_DISTINCT_FROM = FilterOp(name="IS_DISTINCT_FROM", sql="IS DISTINCT FROM")
+    IS_NOT_DISTINCT_FROM = FilterOp(name="IS_NOT_DISTINCT_FROM", sql="IS NOT DISTINCT FROM")
 
     # Subquery operators
-    ANY = "ANY"
-    ALL = "ALL"
-    SOME = "SOME"
+    ANY = FilterOp(name="ANY", sql="ANY")
+    ALL = FilterOp(name="ALL", sql="ALL")
+    SOME = FilterOp(name="SOME", sql="SOME")
 
     # Exists operators
-    EXISTS = "EXISTS"
-    NOT_EXISTS = "NOT EXISTS"
+    EXISTS = FilterOp(name="EXISTS", sql="EXISTS")
+    NOT_EXISTS = FilterOp(name="NOT_EXISTS", sql="NOT EXISTS")
