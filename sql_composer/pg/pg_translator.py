@@ -278,11 +278,11 @@ class PgSqlTranslator(SqlTranslator):
             page_criteria_as_sql.append(f"OFFSET {pagination.offset}")
         return " ".join(page_criteria_as_sql)
 
-    def query_criteria_to_sql(self, query_criteria: SqlQueryCriteria, columns_by_name: dict[str, Column]) -> str:
-
-        assert query_criteria is not None, "query_criteria is required"
+    def query_criteria_to_sql(self, query_criteria: SqlQueryCriteria | None, columns_by_name: dict[str, Column]) -> str:
 
         query_criteria_as_sql = ""
+        if query_criteria is None:
+            return query_criteria_as_sql
 
         # Query Criteria - Where
         if query_criteria.where:
@@ -343,6 +343,7 @@ class PgSqlTranslator(SqlTranslator):
             sort_criteria_as_sql = [
                 f"{self.sort_to_sql(sort)}"
                 for sort in query_criteria.sort
+                if sort.field in columns_by_name
             ]
 
             if sort_criteria_as_sql:
@@ -558,9 +559,9 @@ class PgSqlTranslator(SqlTranslator):
 
             # Exists operators
             case PgFilterOp.EXISTS:
-                return f"EXISTS(%s)", [where.values[0]]
+                return "EXISTS(%s)", [where.values[0]]
             case PgFilterOp.NOT_EXISTS:
-                return f"NOT EXISTS(%s)", [where.values[0]]
+                return "NOT EXISTS(%s)", [where.values[0]]
 
             # Default case for any unhandled operators
             case _:
