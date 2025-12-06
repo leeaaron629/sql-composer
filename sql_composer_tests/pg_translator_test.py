@@ -1,14 +1,22 @@
 import unittest
 from sql_composer.pg.pg_translator import PgSqlTranslator
-from sql_composer.db_models import Column
+from sql_composer.db_models import Column, Table
 from sql_composer.db_conditions import Where, WhereClause, Sort, Page, SqlQueryCriteria, SortType
 from sql_composer.pg.pg_data_types import PgDataTypes
 from sql_composer.pg.pg_filter_op import PgFilterOp
 
 
+class MockTable(Table):
+    """Mock table for query_criteria_to_sql tests"""
+    name = Column("name", PgDataTypes.TEXT)
+    age = Column("age", PgDataTypes.INT)
+    created_at = Column("created_at", PgDataTypes.TIMESTAMP)
+
+
 class TestPgSqlTranslator(unittest.TestCase):
     def setUp(self):
         self.translator = PgSqlTranslator()
+        self.test_table = MockTable("test_table")
 
     def test_val_to_sql_string_types(self):
         """Test val_to_sql for string data types"""
@@ -165,19 +173,14 @@ class TestPgSqlTranslator(unittest.TestCase):
 
     def test_query_criteria_to_sql_where_only(self):
         """Test query_criteria_to_sql with only WHERE clause"""
-        columns_by_name = {
-            "name": Column("name", PgDataTypes.TEXT),
-            "age": Column("age", PgDataTypes.INT)
-        }
-        
         where_clause = WhereClause([
             Where("name", PgFilterOp.EQUAL, ["John"]),
             Where("age", PgFilterOp.GREATER_THAN, [25])
         ])
-        
+
         query_criteria = SqlQueryCriteria(where=where_clause)
-        result = self.translator.query_criteria_to_sql(query_criteria, columns_by_name)
-        
+        result = self.translator.query_criteria_to_sql(query_criteria, self.test_table)
+
         self.assertIn("WHERE", result)
         self.assertIn("name = 'John'", result)
         self.assertIn("age > 25", result)
@@ -185,55 +188,43 @@ class TestPgSqlTranslator(unittest.TestCase):
 
     def test_query_criteria_to_sql_sort_only(self):
         """Test query_criteria_to_sql with only SORT clause"""
-        columns_by_name = {
-            "name": Column("name", PgDataTypes.TEXT),
-            "created_at": Column("created_at", PgDataTypes.TIMESTAMP)
-        }
-        
         sort_clause = [
             Sort("name", SortType.ASC),
             Sort("created_at", SortType.DESC)
         ]
-        
+
         query_criteria = SqlQueryCriteria(sort=sort_clause)
-        result = self.translator.query_criteria_to_sql(query_criteria, columns_by_name)
-        
+        result = self.translator.query_criteria_to_sql(query_criteria, self.test_table)
+
         self.assertIn("ORDER BY", result)
         self.assertIn("name ASC", result)
         self.assertIn("created_at DESC", result)
 
     def test_query_criteria_to_sql_pagination_only(self):
         """Test query_criteria_to_sql with only PAGINATION clause"""
-        columns_by_name = {}
-        
         page = Page(limit=10, offset=20)
         query_criteria = SqlQueryCriteria(page=page)
-        result = self.translator.query_criteria_to_sql(query_criteria, columns_by_name)
-        
+        result = self.translator.query_criteria_to_sql(query_criteria, self.test_table)
+
         self.assertIn("LIMIT 10", result)
         self.assertIn("OFFSET 20", result)
 
     def test_query_criteria_to_sql_complete(self):
         """Test query_criteria_to_sql with all clauses"""
-        columns_by_name = {
-            "name": Column("name", PgDataTypes.TEXT),
-            "age": Column("age", PgDataTypes.INT)
-        }
-        
         where_clause = WhereClause([
             Where("name", PgFilterOp.EQUAL, ["John"])
         ])
         sort_clause = [Sort("age", SortType.ASC)]
         page = Page(limit=10, offset=20)
-        
+
         query_criteria = SqlQueryCriteria(
             where=where_clause,
             sort=sort_clause,
             page=page
         )
-        
-        result = self.translator.query_criteria_to_sql(query_criteria, columns_by_name)
-        
+
+        result = self.translator.query_criteria_to_sql(query_criteria, self.test_table)
+
         # Should contain all clauses
         self.assertIn("WHERE", result)
         self.assertIn("ORDER BY", result)
@@ -244,18 +235,14 @@ class TestPgSqlTranslator(unittest.TestCase):
 
     def test_query_criteria_to_sql_unknown_field(self):
         """Test query_criteria_to_sql with unknown field (should be filtered out)"""
-        columns_by_name = {
-            "name": Column("name", PgDataTypes.TEXT)
-        }
-        
         where_clause = WhereClause([
             Where("name", PgFilterOp.EQUAL, ["John"]),
             Where("unknown_field", PgFilterOp.EQUAL, ["value"])  # This should be filtered out
         ])
-        
+
         query_criteria = SqlQueryCriteria(where=where_clause)
-        result = self.translator.query_criteria_to_sql(query_criteria, columns_by_name)
-        
+        result = self.translator.query_criteria_to_sql(query_criteria, self.test_table)
+
         # Should only contain the known field
         self.assertIn("name = 'John'", result)
         self.assertNotIn("unknown_field", result)

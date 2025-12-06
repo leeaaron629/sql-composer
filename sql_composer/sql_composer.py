@@ -41,10 +41,10 @@ class SqlComposer:
             col_names_fmted = ", ".join([f"{alias}.{c_name}" for c_name in col_names])
 
         stmt = f"""
-        SELECT 
+        SELECT
             {col_names_fmted}
         FROM {table_name}
-        {self.translator.query_criteria_to_sql(query_criteria, columns_by_name)}
+        {self.translator.query_criteria_to_sql(query_criteria, self.table)}
         """
 
         return textwrap.dedent(stmt)
@@ -73,7 +73,7 @@ class SqlComposer:
             col_names_fmted = ", ".join([f"{alias}.{c_name}" for c_name in col_names])
 
         # Generate parameterized SQL and extract parameters
-        sql, params = self.translator.query_criteria_to_sql_with_params(query_criteria, columns_by_name)
+        sql, params = self.translator.query_criteria_to_sql_with_params(query_criteria, self.table)
 
         stmt = f"""
         SELECT

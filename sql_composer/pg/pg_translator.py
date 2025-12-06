@@ -1,6 +1,6 @@
 import math
 from typing import Any, List, Tuple
-from sql_composer.db_models import Column
+from sql_composer.db_models import Column, Table
 from sql_composer.db_conditions import Where, Sort, Page, SqlQueryCriteria
 from sql_composer.pg.pg_data_types import PgDataTypes
 from sql_composer.pg.pg_filter_op import PgFilterOp
@@ -75,9 +75,6 @@ class PgSqlTranslator(SqlTranslator):
     def where_to_sql(self, where: Where, column: Column) -> str:
         # Convert all values to SQL expressions
         values_as_pg_sql = [self.val_to_sql(column, value) for value in where.values]
-
-        if len(where.values) == 0:
-            raise ValueError(f"Operator {where.op} requires at least 1 value, got 0")
 
         if len(values_as_pg_sql) != 1 and where.op in (
             PgFilterOp.EQUAL,
@@ -155,11 +152,15 @@ class PgSqlTranslator(SqlTranslator):
 
             # Multiple value operators - support multiple values
             case PgFilterOp.IN:
+                if len(where.values) == 0:
+                    raise ValueError(f"Operator {where.op} requires at least 1 value, got 0")
                 if len(where.values) == 1:
                     return f"{where.field} = {values_as_pg_sql[0]}"
                 else:
                     return f"{where.field} IN ({', '.join(values_as_pg_sql)})"
             case PgFilterOp.NOT_IN:
+                if len(where.values) == 0:
+                    raise ValueError(f"Operator {where.op} requires at least 1 value, got 0")
                 if len(where.values) == 1:
                     return f"{where.field} != {values_as_pg_sql[0]}"
                 else:
@@ -296,11 +297,13 @@ class PgSqlTranslator(SqlTranslator):
             page_criteria_as_sql.append(f"OFFSET {pagination.offset}")
         return " ".join(page_criteria_as_sql)
 
-    def query_criteria_to_sql(self, query_criteria: SqlQueryCriteria | None, columns_by_name: dict[str, Column]) -> str:
+    def query_criteria_to_sql(self, query_criteria: SqlQueryCriteria | None, table: Table) -> str:
 
         query_criteria_as_sql = ""
         if query_criteria is None:
             return query_criteria_as_sql
+
+        columns_by_name = {c.name: c for c in table.columns}
 
         # Query Criteria - Where
         if query_criteria.where:
@@ -332,7 +335,7 @@ class PgSqlTranslator(SqlTranslator):
 
         return query_criteria_as_sql
 
-    def query_criteria_to_sql_with_params(self, query_criteria: SqlQueryCriteria, columns_by_name: dict[str, Column]) -> Tuple[str, List[Any]]:
+    def query_criteria_to_sql_with_params(self, query_criteria: SqlQueryCriteria, table: Table) -> Tuple[str, List[Any]]:
         """
         Generate parameterized SQL with extracted parameters.
         Returns a tuple of (SQL with %s placeholders, parameters list).
@@ -340,6 +343,7 @@ class PgSqlTranslator(SqlTranslator):
         if query_criteria is None:
             return "", []
 
+        columns_by_name = {c.name: c for c in table.columns}
         query_criteria_as_sql = ""
         params = []
 
@@ -348,7 +352,7 @@ class PgSqlTranslator(SqlTranslator):
             conditions_as_sql = []
             for condition in query_criteria.where.conditions:
                 if condition.field in columns_by_name:
-                    condition_sql, condition_params = self.where_to_sql_with_params(condition, columns_by_name[condition.field])
+                    condition_sql, condition_params = self.where_to_sql_with_params(condition)
                     conditions_as_sql.append(condition_sql)
                     params.extend(condition_params)
 
@@ -374,13 +378,11 @@ class PgSqlTranslator(SqlTranslator):
 
         return query_criteria_as_sql, params
 
-    def where_to_sql_with_params(self, where: Where, column: Column) -> Tuple[str, List[Any]]:
+    def where_to_sql_with_params(self, where: Where) -> Tuple[str, List[Any]]:
         """
         Generate parameterized WHERE clause with extracted parameters.
         Returns a tuple of (SQL with %s placeholders, parameters list).
         """
-        if len(where.values) == 0:
-            raise ValueError(f"Operator {where.op} requires at least 1 value, got 0")
 
         # Validate number of values for the operator
         if len(where.values) != 1 and where.op in (
@@ -442,10 +444,6 @@ class PgSqlTranslator(SqlTranslator):
                 f"Operator {where.op} requires exactly 2 values, got {len(where.values)}"
             )
 
-        # Handle operators that don't need parameters
-        if where.op in (PgFilterOp.IS_NULL, PgFilterOp.IS_NOT_NULL):
-            return f"{where.field} {where.op.value}", []
-
         # Handle operators that need parameters
         match where.op:
             # Single value operators
@@ -462,14 +460,23 @@ class PgSqlTranslator(SqlTranslator):
             case PgFilterOp.GREATER_THAN_OR_EQUAL:
                 return f"{where.field} >= %s", [where.values[0]]
 
+            case PgFilterOp.IS_NULL:
+                return f"{where.field} IS NULL", []
+            case PgFilterOp.IS_NOT_NULL:
+                return f"{where.field} IS NOT NULL", []
+
             # Multiple value operators
             case PgFilterOp.IN:
+                if len(where.values) == 0:
+                    raise ValueError(f"Operator {where.op} requires at least 1 value, got 0")
                 if len(where.values) == 1:
                     return f"{where.field} = %s", [where.values[0]]
                 else:
                     placeholders = ", ".join(["%s"] * len(where.values))
                     return f"{where.field} IN ({placeholders})", where.values
             case PgFilterOp.NOT_IN:
+                if len(where.values) == 0:
+                    raise ValueError(f"Operator {where.op} requires at least 1 value, got 0")
                 if len(where.values) == 1:
                     return f"{where.field} != %s", [where.values[0]]
                 else:
