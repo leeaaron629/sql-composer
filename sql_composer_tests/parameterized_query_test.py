@@ -4,7 +4,6 @@ Test file demonstrating parameterized query functionality.
 This shows how to use the SQL Composer with parameterized queries for safe database operations.
 """
 
-from typing import Any
 from sql_composer.db_models import Table, Column
 from sql_composer.pg.pg_data_types import PgDataTypes
 from sql_composer.sql_composer import SqlComposer

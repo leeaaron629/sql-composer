@@ -2,7 +2,7 @@ from typing import List, Any, Tuple
 from sql_composer.db_models import Table, Column
 import textwrap
 from sql_composer.sql_translator import SqlTranslator
-from sql_composer.db_conditions import WhereClause, SqlQueryCriteria
+from sql_composer.db_conditions import SqlQueryCriteria
 
 """
 SqlComposer is a class that composes SQL statements.
