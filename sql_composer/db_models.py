@@ -3,6 +3,7 @@ from typing import List
 from abc import ABC
 from enum import Enum
 
+
 @dataclass
 class Column:
     name: str
@@ -15,8 +16,4 @@ class Table(ABC):
 
     def __init__(self, name: str):
         self.name = name
-        self.columns = [
-            value
-            for name, value in vars(self.__class__).items()
-            if isinstance(value, Column)
-        ]
+        self.columns = [value for name, value in vars(self.__class__).items() if isinstance(value, Column)]

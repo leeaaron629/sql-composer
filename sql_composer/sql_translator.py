@@ -26,5 +26,7 @@ class SqlTranslator(ABC):
         pass
 
     @abstractmethod
-    def query_criteria_to_sql_with_params(self, query_criteria: SqlQueryCriteria | None, table: Table) -> Tuple[str, List[Any]]:
+    def query_criteria_to_sql_with_params(
+        self, query_criteria: SqlQueryCriteria | None, table: Table
+    ) -> Tuple[str, List[Any]]:
         pass

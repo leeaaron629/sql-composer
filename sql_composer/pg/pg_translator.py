@@ -36,12 +36,7 @@ class PgSqlTranslator(SqlTranslator):
 
     def val_to_sql(self, column: Column, value: Any) -> str:
         match column.type_:
-            case (
-                PgDataTypes.TEXT
-                | PgDataTypes.VARCHAR
-                | PgDataTypes.CHAR
-                | PgDataTypes.CHARACTER_VARYING
-            ):
+            case PgDataTypes.TEXT | PgDataTypes.VARCHAR | PgDataTypes.CHAR | PgDataTypes.CHARACTER_VARYING:
                 return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.INT | PgDataTypes.INT4 | PgDataTypes.INTEGER:
                 return str(value)
@@ -131,17 +126,13 @@ class PgSqlTranslator(SqlTranslator):
             PgFilterOp.EXISTS,
             PgFilterOp.NOT_EXISTS,
         ):
-            raise ValueError(
-                f"Operator {where.op} requires exactly 1 value, got {len(where.values)}"
-            )
+            raise ValueError(f"Operator {where.op} requires exactly 1 value, got {len(where.values)}")
 
         if len(values_as_pg_sql) != 2 and where.op in (
             PgFilterOp.BETWEEN,
             PgFilterOp.NOT_BETWEEN,
         ):
-            raise ValueError(
-                f"Operator {where.op} requires exactly 2 values, got {len(where.values)}"
-            )
+            raise ValueError(f"Operator {where.op} requires exactly 2 values, got {len(where.values)}")
 
         match where.op:
             # Single value operators - raise exception if multiple values provided
@@ -290,9 +281,7 @@ class PgSqlTranslator(SqlTranslator):
 
             # Default case for any unhandled operators
             case _:
-                raise ValueError(
-                    f"Unsupported operator: {where.op} for field {where.field}"
-                )
+                raise ValueError(f"Unsupported operator: {where.op} for field {where.field}")
 
     def sort_to_sql(self, sort: Sort) -> str:
         return f"{sort.field} {sort.sort_type.value}"
@@ -306,7 +295,6 @@ class PgSqlTranslator(SqlTranslator):
         return " ".join(page_criteria_as_sql)
 
     def query_criteria_to_sql(self, query_criteria: SqlQueryCriteria | None, table: Table) -> str:
-
         query_criteria_as_sql = ""
         if query_criteria is None:
             return query_criteria_as_sql
@@ -328,9 +316,7 @@ class PgSqlTranslator(SqlTranslator):
         # Query Criteria - Sort
         if query_criteria.sort:
             sort_criteria_as_sql = [
-                f"{self.sort_to_sql(sort)}"
-                for sort in query_criteria.sort
-                if sort.field in columns_by_name
+                f"{self.sort_to_sql(sort)}" for sort in query_criteria.sort if sort.field in columns_by_name
             ]
 
             if sort_criteria_as_sql:
@@ -343,7 +329,9 @@ class PgSqlTranslator(SqlTranslator):
 
         return query_criteria_as_sql
 
-    def query_criteria_to_sql_with_params(self, query_criteria: SqlQueryCriteria, table: Table) -> Tuple[str, List[Any]]:
+    def query_criteria_to_sql_with_params(
+        self, query_criteria: SqlQueryCriteria, table: Table
+    ) -> Tuple[str, List[Any]]:
         """
         Generate parameterized SQL with extracted parameters.
         Returns a tuple of (SQL with %s placeholders, parameters list).
@@ -371,9 +359,7 @@ class PgSqlTranslator(SqlTranslator):
         # Query Criteria - Sort
         if query_criteria.sort:
             sort_criteria_as_sql = [
-                f"{self.sort_to_sql(sort)}"
-                for sort in query_criteria.sort
-                if sort.field in columns_by_name
+                f"{self.sort_to_sql(sort)}" for sort in query_criteria.sort if sort.field in columns_by_name
             ]
 
             if sort_criteria_as_sql:
@@ -440,17 +426,13 @@ class PgSqlTranslator(SqlTranslator):
             PgFilterOp.EXISTS,
             PgFilterOp.NOT_EXISTS,
         ):
-            raise ValueError(
-                f"Operator {where.op} requires exactly 1 value, got {len(where.values)}"
-            )
+            raise ValueError(f"Operator {where.op} requires exactly 1 value, got {len(where.values)}")
 
         if len(where.values) != 2 and where.op in (
             PgFilterOp.BETWEEN,
             PgFilterOp.NOT_BETWEEN,
         ):
-            raise ValueError(
-                f"Operator {where.op} requires exactly 2 values, got {len(where.values)}"
-            )
+            raise ValueError(f"Operator {where.op} requires exactly 2 values, got {len(where.values)}")
 
         # Handle operators that need parameters
         match where.op:
@@ -601,6 +583,4 @@ class PgSqlTranslator(SqlTranslator):
 
             # Default case for any unhandled operators
             case _:
-                raise ValueError(
-                    f"Unsupported operator: {where.op} for field {where.field}"
-                )
+                raise ValueError(f"Unsupported operator: {where.op} for field {where.field}")

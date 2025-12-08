@@ -1,6 +1,7 @@
 from sql_composer.db_conditions import FilterOp
 from enum import Enum
 
+
 # TODO If sql is not needed, remove it and keep the name only
 class PgFilterOp(Enum):
     # Comparison operators

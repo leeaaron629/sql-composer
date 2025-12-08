@@ -19,9 +19,7 @@ def test_postgres_connection(
     cursor = None
     try:
         # Connect to PostgreSQL database
-        connection = psycopg2.connect(
-            host=host, database=database, user=user, password=password, port=port
-        )
+        connection = psycopg2.connect(host=host, database=database, user=user, password=password, port=port)
 
         # Create a cursor to perform database operations
         cursor = connection.cursor()
