@@ -14,7 +14,7 @@ from sql_composer.pg.pg_filter_op import PgFilterOp
 
 class UserTable(Table):
     id = Column(name="id", type_=PgDataTypes.INT)
-    name = Column(name="name", type_=PgDataTypes.TEXT)
+    username = Column(name="name", type_=PgDataTypes.TEXT)
     email = Column(name="email", type_=PgDataTypes.TEXT)
     age = Column(name="age", type_=PgDataTypes.INT)
     active = Column(name="active", type_=PgDataTypes.BOOLEAN)
@@ -34,7 +34,7 @@ def demonstrate_parameterized_queries():
     print("-" * 30)
 
     # Simple parameterized select
-    sql, params = composer.select_with_params()
+    sql, params = composer.select_with_params(table.columns)
     print(f"Basic SELECT:\nSQL: {sql.strip()}\nParams: {params}")
 
     # Parameterized select with WHERE clause
@@ -43,7 +43,7 @@ def demonstrate_parameterized_queries():
     )
     query_criteria = SqlQueryCriteria(where=where_clause)
 
-    sql, params = composer.select_with_params(query_criteria=query_criteria)
+    sql, params = composer.select_with_params(table.columns, query_criteria=query_criteria)
     print(f"\nSELECT with WHERE:\nSQL: {sql.strip()}\nParams: {params}")
 
     # Parameterized select with complex conditions
@@ -58,7 +58,7 @@ def demonstrate_parameterized_queries():
         where=complex_where, sort=[Sort("name", SortType.ASC)], page=Page(limit=10, offset=0)
     )
 
-    sql, params = composer.select_with_params(query_criteria=complex_criteria)
+    sql, params = composer.select_with_params(table.columns, query_criteria=complex_criteria)
     print(f"\nComplex SELECT:\nSQL: {sql.strip()}\nParams: {params}")
 
     print("\n2️⃣ PARAMETERIZED INSERT QUERIES")
@@ -146,7 +146,7 @@ def demonstrate_sql_injection_prevention():
         query_criteria = SqlQueryCriteria(where=where_clause)
 
         # Generate parameterized query
-        sql, params = composer.select_with_params(query_criteria=query_criteria)
+        sql, params = composer.select_with_params(table.columns, query_criteria=query_criteria)
 
         print(f"Generated SQL: {sql.strip()}")
         print(f"Parameters: {params}")

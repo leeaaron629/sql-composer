@@ -9,7 +9,7 @@ from sql_composer.pg.pg_filter_op import PgFilterOp
 class MockTable(Table):
     """Mock table for query_criteria_to_sql tests"""
 
-    name = Column("name", PgDataTypes.TEXT)
+    username = Column("name", PgDataTypes.TEXT)
     age = Column("age", PgDataTypes.INT)
     created_at = Column("created_at", PgDataTypes.TIMESTAMP)
 
