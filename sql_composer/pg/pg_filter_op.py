@@ -1,12 +1,11 @@
 from sql_composer.db_conditions import FilterOp
-from enum import Enum
+
 
 # TODO If sql is not needed, remove it and keep the name only
-class PgFilterOp(Enum):
+class PgFilterOp:
     # Comparison operators
     EQUAL = FilterOp(name="EQUAL", sql="=")
     NOT_EQUAL = FilterOp(name="NOT_EQUAL", sql="!=")
-    NOT_EQUAL_ALT = FilterOp(name="NOT_EQUAL_ALT", sql="<>")
     LESS_THAN = FilterOp(name="LESS_THAN", sql="<")
     LESS_THAN_OR_EQUAL = FilterOp(name="LESS_THAN_OR_EQUAL", sql="<=")
     GREATER_THAN = FilterOp(name="GREATER_THAN", sql=">")

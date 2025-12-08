@@ -36,9 +36,9 @@ if __name__ == "__main__":
         print(f"{c.name} - {c.type_}")
 
     print("--------------------------------SELECT--------------------------------")
-    print(f"select stmt_1: {sql_composer.select()}")
+    print(f"select stmt_1: {sql_composer.select(columns=table.columns)}")
     print(f"select stmt_2: {sql_composer.select(columns=[table.some_int_field])}")
-    print(f"select stmt_3: {sql_composer.select(alias='alias_1')}")
+    print(f"select stmt_3: {sql_composer.select(columns=table.columns, alias='alias_1')}")
     print("--------------------------------INSERT--------------------------------")
     key_values_1: dict[str, Any] = {
         "some_str_field": "some_str_value",

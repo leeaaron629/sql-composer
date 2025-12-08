@@ -28,6 +28,7 @@ class FilterOp:
     name: str
     sql: str
 
+
 @dataclass
 class Where:
     field: str

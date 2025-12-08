@@ -1,4 +1,4 @@
-.PHONY: help install build test lint format clean
+.PHONY: help install build test lint format clean publish publish-test
 
 # UV executable
 UV := uv
@@ -13,31 +13,31 @@ help:
 	@echo "  make lint         - Run linters (ruff, pyright)"
 	@echo "  make format       - Format code using ruff"
 	@echo "  make clean        - Remove Python cache files and build artifacts"
+	@echo "  make publish-test - Publish package to TestPyPI"
+	@echo "  make publish      - Publish package to PyPI"
 
 install:
-	@echo "Creating virtual environment if it doesn't exist..."
-	$(UV) venv
 	@echo "Installing dependencies..."
-	$(UV) pip install -e ".[dev]"
+	$(UV) sync --extra dev
 
-build:
+build: clean
 	@echo "Building package..."
-	$(UV) run python -m build
+	$(UV) build
 
 test:
 	@echo "Running tests..."
-	$(UV) run python -m pytest sql_composer_tests/ --cov=$(PROJECT) --cov-report=term-missing	
+	$(UV) run pytest sql_composer_tests/ --cov=$(PROJECT) --cov-report=term-missing
 
 lint:
 	@echo "Running linters..."
-	$(UV) run python -m ruff check .
-	$(UV) run python -m ruff format --check .
-	$(UV) run python -m pyright
+	$(UV) run ruff check .
+	$(UV) run ruff format --check .
+	$(UV) run pyright
 
 format:
 	@echo "Formatting code..."
-	$(UV) run python -m ruff format .
-	$(UV) run python -m ruff check --fix .
+	$(UV) run ruff format .
+	$(UV) run ruff check --fix .
 
 clean:
 	@echo "Cleaning up..."
@@ -54,4 +54,14 @@ clean:
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 	rm -rf build/
 	rm -rf dist/
-	rm -rf .eggs/ 
+	rm -rf .eggs/
+
+# Publish to TestPyPI first to verify everything works
+publish-test: build
+	@echo "Publishing to TestPyPI..."
+	$(UV) publish --publish-url https://test.pypi.org/legacy/
+
+# Publish to PyPI (production)
+publish: build
+	@echo "Publishing to PyPI..."
+	$(UV) publish
