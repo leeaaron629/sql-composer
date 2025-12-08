@@ -2,13 +2,24 @@
 # This workflow runs when a GitHub release is published
 #
 # Setup required (one-time):
-# 1. Go to https://pypi.org/manage/account/publishing/
+#
+# For TestPyPI:
+# 1. Go to https://test.pypi.org/manage/account/publishing/
 # 2. Add a new "pending publisher" with:
-#    - PyPI Project Name: sql-composer
+#    - PyPI Project Name: shiba-sql-composer
 #    - Owner: leeaaron629 (your GitHub username)
 #    - Repository name: sql-composer
 #    - Workflow name: publish.yml
-#    - Environment name: pypi (optional, but recommended)
+#    - Environment name: testpypi
+#
+# For PyPI:
+# 1. Go to https://pypi.org/manage/account/publishing/
+# 2. Add a new "pending publisher" with:
+#    - PyPI Project Name: shiba-sql-composer
+#    - Owner: leeaaron629 (your GitHub username)
+#    - Repository name: sql-composer
+#    - Workflow name: publish.yml
+#    - Environment name: pypi
 
 name: Publish to PyPI
 
@@ -56,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/sql-composer
+      url: https://test.pypi.org/p/shiba-sql-composer
     permissions:
       id-token: write  # Required for trusted publishing
 
@@ -82,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/sql-composer
+      url: https://pypi.org/p/shiba-sql-composer
     permissions:
       id-token: write  # Required for trusted publishing
 
