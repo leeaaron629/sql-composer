@@ -330,7 +330,7 @@ class PgSqlTranslator(SqlTranslator):
         return query_criteria_as_sql
 
     def query_criteria_to_sql_with_params(
-        self, query_criteria: SqlQueryCriteria, table: Table
+        self, query_criteria: SqlQueryCriteria | None, table: Table
     ) -> Tuple[str, List[Any]]:
         """
         Generate parameterized SQL with extracted parameters.
