@@ -66,6 +66,13 @@ class PgSqlTranslator(SqlTranslator):
             case PgDataTypes.TIME:
                 return f"'{self._escape_string(str(value))}'"
             case PgDataTypes.JSON | PgDataTypes.JSONB:
+                # If value is already a string, validate it's valid JSON
+                if isinstance(value, str):
+                    try:
+                        json.loads(value)
+                    except json.JSONDecodeError as e:
+                        raise ValueError(f"Invalid JSON string for column '{column.name}': {e}")
+                    return f"'{self._escape_string(value)}'"
                 return f"'{self._escape_string(json.dumps(value))}'"
             case PgDataTypes.UUID:
                 return f"'{self._escape_string(str(value))}'"
