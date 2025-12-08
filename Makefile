@@ -17,10 +17,8 @@ help:
 	@echo "  make publish      - Publish package to PyPI"
 
 install:
-	@echo "Creating virtual environment if it doesn't exist..."
-	$(UV) venv
 	@echo "Installing dependencies..."
-	$(UV) pip install -e ".[dev]"
+	$(UV) sync --extra dev
 
 build: clean
 	@echo "Building package..."
@@ -28,18 +26,18 @@ build: clean
 
 test:
 	@echo "Running tests..."
-	$(UV) run python -m pytest sql_composer_tests/ --cov=$(PROJECT) --cov-report=term-missing
+	$(UV) run pytest sql_composer_tests/ --cov=$(PROJECT) --cov-report=term-missing
 
 lint:
 	@echo "Running linters..."
-	$(UV) run python -m ruff check .
-	$(UV) run python -m ruff format --check .
-	$(UV) run python -m pyright
+	$(UV) run ruff check .
+	$(UV) run ruff format --check .
+	$(UV) run pyright
 
 format:
 	@echo "Formatting code..."
-	$(UV) run python -m ruff format .
-	$(UV) run python -m ruff check --fix .
+	$(UV) run ruff format .
+	$(UV) run ruff check --fix .
 
 clean:
 	@echo "Cleaning up..."
