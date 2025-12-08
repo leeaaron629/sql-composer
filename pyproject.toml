@@ -34,15 +34,15 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/leeaaron326/sql-composer"
-Repository = "https://github.com/leeaaron326/sql-composer"
-Issues = "https://github.com/leeaaron326/sql-composer/issues"
+Homepage = "https://github.com/leeaaron629/sql-composer"
+Repository = "https://github.com/leeaaron629/sql-composer"
+Issues = "https://github.com/leeaaron629/sql-composer/issues"
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.1.0",
-    "pyright>=1.1.0",
-    "pytest>=7.0.0",
+    "ruff>=0.14.8",
+    "pyright>=1.1.407",
+    "pytest>=9.0.1",
     "pytest-cov>=4.0.0",
 ]
 
