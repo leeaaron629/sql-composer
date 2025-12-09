@@ -1,5 +1,5 @@
 [project]
-name = "sql-composer"
+name = "shiba-sql-composer"
 version = "0.1.0"
 description = "A type-safe SQL query builder and composer for Python"
 authors = [
